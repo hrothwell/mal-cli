@@ -40,7 +40,6 @@ test {
     useJUnitPlatform()
 }
 
-
 tasks {
     compileKotlin {
         kotlinOptions {
@@ -51,6 +50,9 @@ tasks {
         kotlinOptions {
             jvmTarget = "11"
         }
+    }
+    build {
+        finalizedBy(installDist)
     }
 }
 

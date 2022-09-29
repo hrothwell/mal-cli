@@ -4,7 +4,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.choice
 import com.github.kittinunf.fuel.Fuel
+import com.hrothwell.anime.domain.ListStatus
 import com.hrothwell.anime.domain.MALUserListResponse
 import java.io.File
 
@@ -15,9 +17,12 @@ class Anime : CliktCommand(
     Ex: C:\Users\hone_the_rat\anime-cli\mal-secret.txt
   """.trimIndent()
 ) {
+  private val possibleListStatusValues = ListStatus.values().map { it.malValue }.toTypedArray()
   private val RED = "\u001b[31m"
   private val user by option("-u", "--user", help = "your user name").default("hone_the_rat")
-  private val list by option("-l", "--list", help = "list to select from").default("plan_to_watch")
+
+  private val list by option("-l", "--list", help = "list to select from").choice(choices = possibleListStatusValues)
+    .default("plan_to_watch")
 
   private val objectMapper = jacksonObjectMapper()
   override fun run() {
@@ -37,7 +42,7 @@ class Anime : CliktCommand(
     }
 
     val headers = "X-MAL-CLIENT-ID" to clientId
-    val listStatus = "listStatus" to list
+    val listStatus = "status" to list
     val limit = "limit" to 1000
 
     val request =
@@ -55,6 +60,11 @@ class Anime : CliktCommand(
       echoError("couldn't read the response from MAL: $response")
 
     }
+  }
+
+  private fun echoWarn(msg: String) {
+    // TODO add colors
+    echo(msg)
   }
 
   private fun echoError(msg: String) {

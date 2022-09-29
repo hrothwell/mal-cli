@@ -21,40 +21,43 @@ class Anime : CliktCommand(
 
   private val objectMapper = jacksonObjectMapper()
   override fun run() {
-    // disable err to ignore the stupid warning messages about illegal reflection or whatever
-    echo(getRandomAnime(user, list))
+    getRandomAnime(user, list)
   }
 
-  fun getRandomAnime(user: String, list: String): Any? {
-    // TODO screw it force the file to $HOME/something
+  fun getRandomAnime(user: String, list: String) {
+    // TODO screw it force users to put a client id in a file somewhere because it just wouldn't work nicely with getResourceAsStream or anything
+    //  also don't want to just have my client secret in git. Don't know how this will work if running natively tho
     val home = System.getProperty("user.home")
     val secretLocation = "$home/anime-cli/mal-secret.txt"
     val clientId = try {
       File(secretLocation).readText()
     } catch (t: Throwable) {
       echoError("You need to place your MAL client id in this file: $secretLocation")
-      return ""
+      return
     }
 
     val headers = "X-MAL-CLIENT-ID" to clientId
     val listStatus = "listStatus" to list
     val limit = "limit" to 1000
+
     val request =
       Fuel.get(path = "https://api.myanimelist.net/v2/users/$user/animelist", parameters = listOf(listStatus, limit))
         .appendHeader(headers)
+
     // TODO check for errors before getting result here
+    //   (also why does Fuel do this this way it feels weird to call .third)
     val response = request.response().third.get()
 
-    return try {
+    try {
       val result = objectMapper.readValue(response, MALUserListResponse::class.java)
-      result.data.random()
+      echo("watch this: ${result.data.random().node.title}")
     } catch (t: Throwable) {
-      echo("oops $t")
-      response
+      echoError("couldn't read the response from MAL: $response")
+
     }
   }
 
-  fun echoError(msg: String) {
+  private fun echoError(msg: String) {
     echo("$RED $msg", err = true)
   }
 }

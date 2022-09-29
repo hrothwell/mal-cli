@@ -19,9 +19,13 @@ class Anime : CliktCommand(
 ) {
   private val possibleListStatusValues = ListStatus.values().map { it.malValue }.toTypedArray()
   private val RED = "\u001b[31m"
-  private val user by option("-u", "--user", help = "your user name").default("hone_the_rat")
+  private val user by option("-u", "--user-name", help = "your user name").default("hone_the_rat")
 
-  private val list by option("-l", "--list", help = "list to select from").choice(choices = possibleListStatusValues)
+  private val list by option(
+    "-l",
+    "--list-status",
+    help = "list to select from"
+  ).choice(choices = possibleListStatusValues)
     .default("plan_to_watch")
 
   private val objectMapper = jacksonObjectMapper()

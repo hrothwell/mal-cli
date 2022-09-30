@@ -1,6 +1,5 @@
 package com.hrothwell.anime
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -8,6 +7,8 @@ import com.github.ajalt.clikt.parameters.types.choice
 import com.github.kittinunf.fuel.Fuel
 import com.hrothwell.anime.domain.ListStatus
 import com.hrothwell.anime.domain.MALUserListResponse
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.*
 import java.io.File
 
 class Anime : CliktCommand(
@@ -28,7 +29,6 @@ class Anime : CliktCommand(
   ).choice(choices = possibleListStatusValues)
     .default("plan_to_watch")
 
-  private val objectMapper = jacksonObjectMapper()
   override fun run() {
     getRandomAnime(user, list)
   }
@@ -55,14 +55,16 @@ class Anime : CliktCommand(
 
     // TODO check for errors before getting result here
     //   (also why does Fuel do this this way it feels weird to call .third)
-    val response = request.response().third.get()
+    val response = request.response()
+    val json = String(response.third.get())
 
     try {
-      val result = objectMapper.readValue(response, MALUserListResponse::class.java)
+      val jsonReader = Json{ignoreUnknownKeys = true}
+      // work around for kotlinx and graalvm native stuff. Wrap it as a list then do this
+      val result = jsonReader.decodeFromString<MALUserListResponse>(json)
       echo("watch this: ${result.data.random().node.title}")
     } catch (t: Throwable) {
-      echoError("couldn't read the response from MAL: $response")
-
+      echoError("couldn't read the response from MAL: $t")
     }
   }
 

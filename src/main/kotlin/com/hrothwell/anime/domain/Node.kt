@@ -1,8 +1,8 @@
 package com.hrothwell.anime.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import kotlinx.serialization.Serializable
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Serializable
 data class Node(
   val id: Long,
   val title: String

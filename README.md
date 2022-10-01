@@ -35,7 +35,7 @@ simple tool to select a random anime from a user's MAL list
     - `mkdir META-INF\native-image`
     - `java -agentlib:native-image-agent=config-output-dir=META-INF\native-image -jar anime-cli-1.0-SNAPSHOT-all.jar`
     - `native-image --no-fallback --report-unsupported-elements-at-runtime -H:ConfigurationFileDirectories=META-INF\native-image -jar anime-cli-1.0-SNAPSHOT-all.jar anime --enable-url-protocols=https --no-server`
-      - Specifying the config director `META-INF\native-image` was crucial for me, I saw some examples online stating `META-INF\native-image` was automatically seen/pulled in when using `native-image`, but it didn't work for me. Likely user error :P
+      - Specifying the config directory `META-INF\native-image` was crucial for me, I saw some examples online stating `META-INF\native-image` was automatically seen/pulled in when using `native-image`, but it didn't work for me. Likely user error :P
     - run the cli! `anime`
   - After this process, `.\build\libs\anime.exe` should be present, from here I just copied it out as this build folder is constantly overwritten by gradle
   - ~~I may potentially write a script to automate this whole process, would be fairly specific to this application as I have several flags I am using for the `native-image` calls and what not~~ already wrote one

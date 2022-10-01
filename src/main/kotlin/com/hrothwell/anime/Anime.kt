@@ -5,21 +5,30 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Response
 import com.hrothwell.anime.domain.ListStatus
-import com.hrothwell.anime.parser.MALJsonParser
+import com.hrothwell.anime.domain.MALUserListResponse
+import com.hrothwell.anime.domain.UserSecrets
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
-import kotlin.random.Random
+import kotlin.system.exitProcess
 
 class Anime : CliktCommand(
   help = "pick a random anime from your MAL lists",
   epilog = """
-    You will need a MAL api key to use this. This api key should be placed in your home directory as anime-cli/mal-secret.txt
-    Ex: C:\Users\hone_the_rat\anime-cli\mal-secret.txt
+    extended user guide, source code, etc - https://github.com/hrothwell/anime-cli
   """.trimIndent()
 ) {
+  val home = System.getProperty("user.home")
+  val secretLocation = "$home/anime-cli/mal-secret.json"
+  val jsonReader = Json{ignoreUnknownKeys = true}
+
   private val possibleListStatusValues = ListStatus.values().map { it.malValue }.toTypedArray()
   private val RED = "\u001b[31m"
-  private val user by option("-u", "--user-name", help = "your user name").default("hone_the_rat")
+  private val user by option("-u", "--user-name", help = """
+    user name. if not provided this will default to "user_name" value in "${home}/anime-cli-mal-secret.json"
+  """.trimIndent())
 
   private val list by option(
     "-l",
@@ -32,44 +41,65 @@ class Anime : CliktCommand(
     getRandomAnime(user, list)
   }
 
-  fun getRandomAnime(user: String, list: String) {
-    // TODO screw it force users to put a client id in a file somewhere because it just wouldn't work nicely with getResourceAsStream or anything
-    //  also don't want to just have my client secret in git. Don't know how this will work if running natively tho
-    val home = System.getProperty("user.home")
-    val secretLocation = "$home/anime-cli/mal-secret.txt"
+  fun getRandomAnime(user: String?, list: String) {
 
-    val clientId = try {
-      File(secretLocation).readText()
-    } catch (t: Throwable) {
-      echoError("You need to place your MAL client id in this file: $secretLocation")
-      return
-    }
-    val headers = "X-MAL-CLIENT-ID" to clientId
+    val clientSecrets = getUserSecrets()
+
+    val headers = "X-MAL-CLIENT-ID" to clientSecrets.client_id
     val listStatus = "status" to list
     val limit = "limit" to 1000
+    val userPathParam = user ?: clientSecrets.user_name
 
     val request =
-      Fuel.get(path = "https://api.myanimelist.net/v2/users/$user/animelist", parameters = listOf(listStatus, limit))
+      Fuel.get(path = "https://api.myanimelist.net/v2/users/$userPathParam/animelist", parameters = listOf(listStatus, limit))
         .appendHeader(headers)
 
     // TODO check for errors before getting result here
     //   (also why does Fuel do this this way it feels weird to call .third)
     val response = request.response()
-    val json = String(response.third.get())
+    handlePotentialHttpErrors(response.second)
 
     try {
-      val parser = MALJsonParser()
-      val anime = parser.getTitles(json)
-      val randomIndex = Random.nextInt(anime.size - 1)
-      echo("watch this: ${anime[randomIndex]}")
+      val json = String(response.third.get())
+      val result = jsonReader.decodeFromString<MALUserListResponse>(json)
+      echo("Anime selected: ${result.data.random().node.title}")
     } catch (t: Throwable) {
       echoError("couldn't read the response from MAL: $t")
-      t.printStackTrace()
+      echoError("Stack trace of error: \n")
+      t.printStackTrace(System.err)
     }
   }
-  private fun echoWarn(msg: String) {
-    // TODO add colors
-    echo(msg)
+
+  fun handlePotentialHttpErrors(response: Response) {
+    if(response.statusCode != 200){
+      echoError("${response.statusCode} error returned from MAL: ${response.responseMessage}")
+      quickErrorHelp()
+      exitProcess(1)
+    }
+  }
+
+  fun getUserSecrets(): UserSecrets{
+    return try {
+      val clientSecretsJsonContent = File(secretLocation).readText()
+      jsonReader.decodeFromString<UserSecrets>(clientSecretsJsonContent)
+    } catch (t: Throwable) {
+      echoError("""
+        You need to place your MAL client id in this file: $secretLocation. File contents should look like:
+        {
+          "user_name": "my user name",
+          "client_id": "my MAL API client ID"
+        }
+      """.trimIndent())
+      exitProcess(1)
+    }
+  }
+
+  fun quickErrorHelp(){
+    echoError("""
+      Quick help / common situations:
+        - 400/403: no client_id set in mal-secret.json or said client_id is invalid. See https://myanimelist.net/apiconfig
+        - 404: user was not found. Was the user you passed in ($user) a real user? If no user passed in, is your mal-secret.json setup correctly?
+    """.trimIndent())
   }
 
   private fun echoError(msg: String) {

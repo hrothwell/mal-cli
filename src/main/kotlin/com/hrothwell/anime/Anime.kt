@@ -1,14 +1,14 @@
 package com.hrothwell.anime
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.kittinunf.fuel.Fuel
 import com.hrothwell.anime.domain.ListStatus
-import com.hrothwell.anime.domain.MALUserListResponse
+import com.hrothwell.anime.parser.MALJsonParser
 import java.io.File
+import kotlin.random.Random
 
 class Anime : CliktCommand(
   help = "pick a random anime from your MAL lists",
@@ -28,7 +28,6 @@ class Anime : CliktCommand(
   ).choice(choices = possibleListStatusValues)
     .default("plan_to_watch")
 
-  private val objectMapper = jacksonObjectMapper()
   override fun run() {
     getRandomAnime(user, list)
   }
@@ -38,13 +37,13 @@ class Anime : CliktCommand(
     //  also don't want to just have my client secret in git. Don't know how this will work if running natively tho
     val home = System.getProperty("user.home")
     val secretLocation = "$home/anime-cli/mal-secret.txt"
+
     val clientId = try {
       File(secretLocation).readText()
     } catch (t: Throwable) {
       echoError("You need to place your MAL client id in this file: $secretLocation")
       return
     }
-
     val headers = "X-MAL-CLIENT-ID" to clientId
     val listStatus = "status" to list
     val limit = "limit" to 1000
@@ -55,17 +54,19 @@ class Anime : CliktCommand(
 
     // TODO check for errors before getting result here
     //   (also why does Fuel do this this way it feels weird to call .third)
-    val response = request.response().third.get()
+    val response = request.response()
+    val json = String(response.third.get())
 
     try {
-      val result = objectMapper.readValue(response, MALUserListResponse::class.java)
-      echo("watch this: ${result.data.random().node.title}")
+      val parser = MALJsonParser()
+      val anime = parser.getTitles(json)
+      val randomIndex = Random.nextInt(anime.size - 1)
+      echo("watch this: ${anime[randomIndex]}")
     } catch (t: Throwable) {
-      echoError("couldn't read the response from MAL: $response")
-
+      echoError("couldn't read the response from MAL: $t")
+      t.printStackTrace()
     }
   }
-
   private fun echoWarn(msg: String) {
     // TODO add colors
     echo(msg)

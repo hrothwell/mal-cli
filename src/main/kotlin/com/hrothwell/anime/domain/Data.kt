@@ -1,8 +1,6 @@
-package com.hrothwell.anime.domain
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Data(
-  val node: Node
-)
+//package com.hrothwell.anime.domain
+//
+//import kotlinx.serialization.Serializable
+//
+//@Serializable
+//data class Data(val node: Node)

@@ -1,3 +1,5 @@
+[![Gradle Build](https://github.com/hrothwell/anime-cli/actions/workflows/gradle.yml/badge.svg)](https://github.com/hrothwell/anime-cli/actions/workflows/gradle.yml)
+
 # anime-cli
 simple tool to select a random anime from a user's MAL list
 

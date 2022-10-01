@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import kotlin.system.exitProcess
 
+
 class Anime : CliktCommand(
   help = "pick a random anime from your MAL lists",
   epilog = """

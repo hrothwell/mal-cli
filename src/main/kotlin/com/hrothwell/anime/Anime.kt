@@ -27,7 +27,7 @@ class Anime : CliktCommand(
   private val possibleListStatusValues = ListStatus.values().map { it.malValue }.toTypedArray()
   private val RED = "\u001b[31m"
   private val user by option("-u", "--user-name", help = """
-    user name. if not provided this will default to "user_name" value in "${home}/anime-cli-mal-secret.json"
+    user name. if not provided this will default to "user_name" value in "${home}/anime-cli/mal-secret.json"
   """.trimIndent())
 
   private val list by option(

@@ -17,7 +17,7 @@ simple tool to select a random anime from a user's MAL list
   - `.\gradlew clean build`
   - `build\install\anime-cli\bin\anime-cli` or `build\install\anime-cli\bin\anime-cli.bat`
 - inputs
-  - `-u --user-name` Defaults to mine for now but will probably add option to include it in the `mal-secret.txt`
+  - `-u --user-name` Defaults to value of `user_name` in `${HOME}\anime-cli\mal-secret.json`
   - `-l --list-status [completed|plan_to_watch|watching|on_hold|dropped]` list to select from
   - `-h --help` show the help info
 

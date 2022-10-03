@@ -55,7 +55,8 @@ class Login: CliktCommand(
     localServer.bind(InetSocketAddress(8080), 0)
     localServer.start()
 
-    // TODO put auth call here
+    // TODO put auth call here. Probably need to be able to "wait" for them to open the URL from MAL and click "authorize", can my http server shut off after just one
+    //  message is received? Start a prompt and wait for user input? "Did you authorize the application? y/n" and then continue
     val result = Fuel.get("$myServerEndpoint?hello=world").response().third.get()
     val resultString = String(result)
     println("resultString $resultString")

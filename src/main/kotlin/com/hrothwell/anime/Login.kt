@@ -1,17 +1,14 @@
-package com.hrothwell.anime.commands
+package com.hrothwell.anime
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kittinunf.fuel.Fuel
-import com.hrothwell.anime.domain.getUserSecrets
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
-import java.lang.Thread.sleep
 import java.net.InetSocketAddress
 import kotlin.random.Random
 
-
-// TODO requires the whole oauth setup bullshit
+// TODO because subcommands don't work, will need to move this in to Anime.kt or think of something else
 class Login: CliktCommand(
   help = """
     Login/authorize this app to have more access to your MAL account
@@ -34,7 +31,7 @@ class Login: CliktCommand(
    */
 
   private fun login(){
-    val userSecrets = getUserSecrets()
+//    val userSecrets = getUserSecrets()
     val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9') + listOf('-', '.', '_', '~')
     val randomString = (1..100)
       .map{ Random.nextInt(0, charPool.size)}
@@ -67,7 +64,7 @@ class Login: CliktCommand(
   }
 
   // TODO Probably need to also return some html that just tells user to go back to CLI
-  private class MyHttpHandler: HttpHandler{
+  private class MyHttpHandler: HttpHandler {
     override fun handle(exchange: HttpExchange?) {
       println("handling http request")
       val f = exchange?.requestURI

@@ -35,6 +35,7 @@ class AnimeUtil {
           "client_id": "my MAL API client ID"
         }
       """.trimIndent())
+        t.printStackTrace(System.err)
         exitProcess(1)
       }
     }

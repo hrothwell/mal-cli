@@ -18,6 +18,10 @@ application {
     mainClass.set("com.hrothwell.anime.Main")
 }
 
+run{
+    standardInput = System.in
+}
+
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {

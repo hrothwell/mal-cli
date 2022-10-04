@@ -1,6 +1,9 @@
 package com.hrothwell.anime.commands
 
+import com.github.ajalt.clikt.completion.completionOption
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.kittinunf.fuel.Fuel
 import com.hrothwell.anime.util.AnimeUtil
 import com.sun.net.httpserver.HttpExchange
@@ -60,7 +63,10 @@ class Login: CliktCommand(
     val userAuthUrl = "https://myanimelist.net/v1/oauth2/authorize?$grantType&$responseType&$clientId&$redirectUri&$codeChallenge"
     echo("click here: $userAuthUrl")
 
-    // TODO need to pause execution or something
+    if(confirm("Was it successful?", default = false, showDefault = false) == true){
+      // TODO continue oauth setup
+      echo("thanks!")
+    }
 
     localServer.stop(0)
   }

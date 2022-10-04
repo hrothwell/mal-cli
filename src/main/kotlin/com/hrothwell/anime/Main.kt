@@ -1,5 +1,7 @@
 package com.hrothwell.anime
 
+import com.hrothwell.anime.commands.Anime
+
 object Main {
   @JvmStatic
   fun main(args: Array<String>) {

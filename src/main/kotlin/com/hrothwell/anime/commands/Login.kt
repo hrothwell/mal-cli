@@ -74,6 +74,7 @@ class Login: CliktCommand(
       println("Here is query string: $params")
       exchange?.sendResponseHeaders(200, 0)
       val outStream = exchange?.responseBody
+      // TODO parse and write oauth token to file
       outStream?.write(params?.toByteArray()!!)
       exchange?.close()
     }

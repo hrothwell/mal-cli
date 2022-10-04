@@ -45,8 +45,6 @@ class Random: CliktCommand(
       Fuel.get(path = "https://api.myanimelist.net/v2/users/$userPathParam/animelist", parameters = listOf(listStatus, limit))
         .appendHeader(headers)
 
-    // TODO check for errors before getting result here
-    //   (also why does Fuel do this this way it feels weird to call .third)
     val response = request.response()
     AnimeUtil.handlePotentialHttpErrors(response.second)
 

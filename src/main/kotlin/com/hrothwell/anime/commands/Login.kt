@@ -47,7 +47,8 @@ class Login: CliktCommand(
     val myServerEndpoint = "http://localhost:8080/anime"
 
     // TODO start a local server, then use that as redirect url? is this needed?
-    //  need HttpHandler and HttpContext
+    //  need HttpHandler and HttpContext for this.
+    //  TODO graalvm didn't like this when I ran this, not sure yet
     val localServer = HttpServer.create()
     val httpContext = localServer.createContext("/anime", MyHttpHandler())
     localServer.bind(InetSocketAddress(8080), 0)
@@ -63,10 +64,11 @@ class Login: CliktCommand(
     val userAuthUrl = "https://myanimelist.net/v1/oauth2/authorize?$grantType&$responseType&$clientId&$redirectUri&$codeChallenge"
     echo("click here: $userAuthUrl")
 
-    if(confirm("Was it successful?", default = false, showDefault = false) == true){
-      // TODO continue oauth setup
-      echo("thanks!")
-    }
+// TODO commented out as it stops builds of native image which is annoying, fix later
+//    if(confirm("Was it successful?", default = false, showDefault = false) == true){
+//      // TODO continue oauth setup
+//      echo("thanks!")
+//    }
 
     localServer.stop(0)
   }

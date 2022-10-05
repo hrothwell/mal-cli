@@ -46,7 +46,7 @@ class Login: CliktCommand(
     val userAuthUrl = "https://myanimelist.net/v1/oauth2/authorize?$grantType&$responseType&$clientId&$redirectUri&$codeChallenge"
     echo("Open this URL to authenticate with MAL: $userAuthUrl")
 
-    // user goes to MAL via link, authorizes, hits MyHttpHandler which updates secrets file
+    // user goes to MAL via link, authorizes, hits MALOAuthHttpHandler which updates secrets file
 
     if(confirm("Did you approve the application?", default = false, showDefault = false) == true){
       localServer.stop(0)

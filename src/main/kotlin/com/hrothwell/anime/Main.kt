@@ -5,6 +5,7 @@ import com.hrothwell.anime.commands.Anime
 import com.hrothwell.anime.commands.Login
 import com.hrothwell.anime.commands.Random
 
+// TODO a debug logger option would be nice
 object Main {
   @JvmStatic
   fun main(args: Array<String>) {

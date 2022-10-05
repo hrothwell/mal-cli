@@ -17,7 +17,5 @@ class Anime : CliktCommand(
     extended user guide, source code, etc - https://github.com/hrothwell/anime-cli
   """.trimIndent()
 ) {
-  // entry point
   override fun run() = Unit
-
 }

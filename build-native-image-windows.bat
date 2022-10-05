@@ -6,10 +6,13 @@ mkdir %root%build\libs\META-INF\native-image
 set configPath=%root%native-image-items\config
 echo running agentlib
 @REM no args for base command, then add all subcommands also. potentially will need to run with any arguments also?
+@REM login process will be kind of annoying/tedious to hit
+@REM TODO add more scenarios or think of a better way to go through program flow. Error scenarios might be hit or miss
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar login
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar random
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar random -u hone_the_rat -l completed
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar random -u unknown_user_113355_idk_error -l completed
 echo config files located here "%configPath%"
 set exeBuildResultPath=%root%native-image-items\build-results
 mkdir %exeBuildResultPath%

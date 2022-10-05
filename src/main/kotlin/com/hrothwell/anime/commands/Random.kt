@@ -8,6 +8,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.hrothwell.anime.domain.ListStatus
 import com.hrothwell.anime.domain.MALUserListResponse
 import com.hrothwell.anime.util.AnimeUtil
+import com.hrothwell.anime.util.FileUtil
 import kotlinx.serialization.decodeFromString
 
 class Random: CliktCommand(
@@ -18,7 +19,7 @@ class Random: CliktCommand(
 
   private val possibleListStatusValues = ListStatus.values().map { it.malValue }.toTypedArray()
   private val user by option("-u", "--user-name", help = """
-    user name. if not provided this will default to "user_name" value in "${AnimeUtil.home}/anime-cli/mal-secret.json"
+    user name. if not provided this will default to "user_name" value in "${FileUtil.home}/anime-cli/mal-secret.json"
   """.trimIndent())
 
   private val list by option(
@@ -32,9 +33,9 @@ class Random: CliktCommand(
     getRandomAnime(user, list)
   }
 
-  fun getRandomAnime(user: String?, list: String) {
+  private fun getRandomAnime(user: String?, list: String) {
 
-    val clientSecrets = AnimeUtil.getUserSecrets()
+    val clientSecrets = FileUtil.getUserSecrets()
 
     val headers = "X-MAL-CLIENT-ID" to clientSecrets.client_id
     val listStatus = "status" to list
@@ -50,7 +51,7 @@ class Random: CliktCommand(
 
     try {
       val json = String(response.third.get())
-      val result = AnimeUtil.jsonReader.decodeFromString<MALUserListResponse>(json)
+      val result = FileUtil.jsonReader.decodeFromString<MALUserListResponse>(json)
       echo("Anime selected: ${result.data.randomOrNull()?.node?.title ?: "$user's $list list was empty"}")
     } catch (t: Throwable) {
       echoError("couldn't read the response from MAL: $t")

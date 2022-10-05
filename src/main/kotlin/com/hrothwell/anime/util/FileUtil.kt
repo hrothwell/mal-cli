@@ -1,6 +1,7 @@
 package com.hrothwell.anime.util
 
 import com.hrothwell.anime.domain.UserSecrets
+import com.hrothwell.anime.exception.UserSecretsException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,18 +19,17 @@ class FileUtil {
         val clientSecretsJsonContent = File(secretLocation).readText()
         jsonReader.decodeFromString<UserSecrets>(clientSecretsJsonContent)
       } catch (t: Throwable) {
-        AnimeUtil.printError("ERROR trying to get secrets from companion object function")
-        AnimeUtil.printError(
-          """ Error getting mal-secret.json
-        You need to place your MAL client id in this file: $secretLocation. File contents should look like:
+        throw UserSecretsException("""
+          ERROR trying to get secrets from companion object function
+          
+          Error getting mal-secret.json
+          File not found/invalid at: $secretLocation
         {
           "user_name": "my user name",
           "client_id": "my MAL API client ID"
         }
-      """.trimIndent()
-        )
-        t.printStackTrace(System.err)
-        exitProcess(1)
+          
+        """.trimIndent(), t)
       }
     }
 
@@ -41,9 +41,9 @@ class FileUtil {
         val newUserSecretsJson = jsonReader.encodeToString(userSecrets)
         File(secretLocation).writeText(newUserSecretsJson)
       } catch(t: Throwable){
-        AnimeUtil.printError("Unable to update mal-secret.json")
-        t.printStackTrace(System.err)
-        exitProcess(1)
+        throw UserSecretsException("""
+          Error updating secrets
+        """.trimIndent(), t)
       }
     }
   }

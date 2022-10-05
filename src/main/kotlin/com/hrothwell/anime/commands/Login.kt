@@ -3,6 +3,7 @@ package com.hrothwell.anime.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kittinunf.fuel.Fuel
 import com.hrothwell.anime.domain.MALOAuthResponse
+import com.hrothwell.anime.exception.LoginException
 import com.hrothwell.anime.util.AnimeUtil
 import com.hrothwell.anime.util.FileUtil
 import com.sun.net.httpserver.HttpExchange
@@ -21,7 +22,15 @@ class Login: CliktCommand(
 
   private val redirectUrl = "http://localhost:8080/anime"
   override fun run() {
-    login()
+    try{
+      login()
+    } catch(t: Throwable){
+      echoError("""
+        Error logging in. Message: ${t.message}
+        Cause: ${t.cause}
+      """.trimIndent())
+      exitProcess(1)
+    }
   }
 
   private fun login(){
@@ -48,12 +57,11 @@ class Login: CliktCommand(
 
     // user goes to MAL via link, authorizes, hits MALOAuthHttpHandler which updates secrets file
 
-    if(confirm("Did you approve the application?", default = false, showDefault = false) == true){
+    if(confirm("Did you approve the application?", default = false, showDefault = true) == true){
       localServer.stop(0)
       exchangeAuthCode(pkceCodeVerifier)
     } else{
-      echoError("Login process terminated by user")
-      exitProcess(1)
+      throw LoginException("Login process terminated by user")
     }
   }
 
@@ -75,9 +83,11 @@ class Login: CliktCommand(
     val request = Fuel.post("https://myanimelist.net/v1/oauth2/token", params)
     val tokenResult = request.response()
     AnimeUtil.handlePotentialHttpErrors(tokenResult.second)
+
     val tokenJson = String(tokenResult.third.get())
     val tokenResponse = FileUtil.jsonReader.decodeFromString<MALOAuthResponse>(tokenJson)
     val updatedSecrets = secrets.copy(oauth_tokens = tokenResponse)
+
     FileUtil.updateUserSecrets(updatedSecrets)
   }
 
@@ -98,9 +108,7 @@ class Login: CliktCommand(
         outStream?.write("return to CLI".toByteArray())
         exchange.close()
       } catch(t: Throwable){
-        AnimeUtil.printError("Error handling http request")
-        t.printStackTrace()
-        exitProcess(1)
+        throw LoginException("Error handling http request response from MAL during login process", t)
       }
     }
 

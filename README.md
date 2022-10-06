@@ -3,10 +3,26 @@
 # anime-cli
 A CLI to interact with MyAnimeList's web API
 
-## Requirements
-- [MAL API client id](https://myanimelist.net/apiconfig)
-- said client id is placed in a json file located at `${HOME}\anime-cli\mal-secret.json` 
-- probably need java if wanting to make your own build, if on Windows there is a provided exe file in `.\windows-native-image-exe`
+## [Pre Requirements to using](../../wiki/Pre-Requirements)
+
+## [Usage](../../wiki/Usage)
+``` 
+~ anime -h
+Usage: anime [OPTIONS] COMMAND [ARGS]...
+
+  CLI for interacting with MAL
+
+Options:
+  -h, --help  Show this message and exit
+
+Commands:
+  login    Login/authorize this app to have more access to MAL API
+  random   Select a random anime from your lists
+  suggest  Get anime suggestions!
+  refresh  call to refresh your oauth tokens
+
+extended user guide, source code, etc - https://github.com/hrothwell/anime-cli
+```
 
 ## Latest Windows native exe
 - Latest windows exe build can be found [here](./native-image-items/build-results/anime.exe)

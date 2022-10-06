@@ -48,24 +48,25 @@ class MALClient {
       val limitToUse = if(limit.toInt() > 100) "100" else limit
       val url = "https://api.myanimelist.net/v2/anime/suggestions?limit=$limitToUse"
       val request = Fuel.get(url)
-      val jsonResult = String(callWithOauth(request).get())
+      val jsonResult = callWithOauth(request).get()
       val malAnimeListResponse = FileUtil.jsonReader.decodeFromString<MALAnimeListResponse>(jsonResult)
       return malAnimeListResponse.data.map{
         it.node.title
       }
     }
 
-    private fun callWithOauth(request: Request): Result<ByteArray, FuelError> {
-      return try{
+    private fun callWithOauth(originalRequest: Request): Result<String, FuelError> {
+      try{
         val userSecrets = FileUtil.getUserSecrets()
-        val updatedRequest = request.appendHeader("Authorization" to "Bearer ${userSecrets.oauth_tokens?.access_token}")
-        val response = updatedRequest.response()
-
-        if(response.second.statusCode == 200){
-          response.third
-        } else{
-          val newToken = refreshOAuthToken()
-          request.appendHeader("Authorization" to "Bearer $newToken").response().third
+        val updatedRequest = originalRequest.appendHeader("Authorization" to "Bearer ${userSecrets.oauth_tokens?.access_token}")
+        val (request, response, result) = updatedRequest.responseString()
+        return when (result){
+          is Result.Failure -> {
+            println("token invalid, refreshing and trying again")
+            val newToken = refreshOAuthToken()
+            request.header("Authorization" to "Bearer $newToken").responseString().third
+          }
+          else -> result
         }
       } catch(t: Throwable){
         throw OAuthCallException("""

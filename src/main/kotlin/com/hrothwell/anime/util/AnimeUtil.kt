@@ -23,7 +23,8 @@ class AnimeUtil {
       if(response.statusCode != 200){
         throw MALResponseException("""
           Could not call ${response.url}
-          ${response.statusCode} error returned from MAL: ${response.responseMessage}
+          ${response.statusCode} error returned from MAL: ${response.body()}
+          
           $quickErrorHelp
         """.trimIndent())
       }

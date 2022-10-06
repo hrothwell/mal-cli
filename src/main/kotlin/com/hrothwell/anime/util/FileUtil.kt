@@ -1,5 +1,6 @@
 package com.hrothwell.anime.util
 
+import com.hrothwell.anime.commands.Anime
 import com.hrothwell.anime.domain.UserSecrets
 import com.hrothwell.anime.exception.UserSecretsException
 import kotlinx.serialization.decodeFromString
@@ -15,8 +16,11 @@ class FileUtil {
     val jsonReader = Json{ignoreUnknownKeys = true}
 
     fun getUserSecrets(): UserSecrets {
+      AnimeUtil.printDebug("getUserSecrets - enter")
       return try {
+        AnimeUtil.printDebug("getUserSecrets - read file from $secretLocation")
         val clientSecretsJsonContent = File(secretLocation).readText()
+        AnimeUtil.printDebug("getUserSecrets - decode secret")
         jsonReader.decodeFromString<UserSecrets>(clientSecretsJsonContent)
       } catch (t: Throwable) {
         throw UserSecretsException("""
@@ -37,8 +41,11 @@ class FileUtil {
      * TODO this and other file methods could use testing probably. Testing in general would be nice to have
      */
     fun updateUserSecrets(userSecrets: UserSecrets){
+      AnimeUtil.printDebug("updateUserSecrets - enter")
       try{
+        AnimeUtil.printDebug("updateUserSecrets - encoding new user secrets")
         val newUserSecretsJson = jsonReader.encodeToString(userSecrets)
+        AnimeUtil.printDebug("updateUserSecrets - writing new secrets to file")
         File(secretLocation).writeText(newUserSecretsJson)
       } catch(t: Throwable){
         throw UserSecretsException("""

@@ -9,8 +9,9 @@ import kotlin.system.exitProcess
  */
 class AnimeUtil {
   companion object{
-
+    var debug = false
     val RED = "\u001b[31m"
+    val RESET = "\u001b[0m"
 
     val quickErrorHelp = """
       Quick help / common situations:
@@ -20,6 +21,7 @@ class AnimeUtil {
     """.trimIndent()
 
     fun handlePotentialHttpErrors(response: Response) {
+      printDebug("Handling potential http errors for response. URL: ${response.url}")
       if(response.statusCode != 200){
         throw MALResponseException("""
           Could not call ${response.url}
@@ -27,6 +29,12 @@ class AnimeUtil {
           
           $quickErrorHelp
         """.trimIndent())
+      }
+    }
+
+    fun printDebug(msg: String){
+      if(debug){
+        println(msg)
       }
     }
   }

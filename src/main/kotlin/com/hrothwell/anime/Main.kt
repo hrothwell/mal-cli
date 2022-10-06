@@ -7,6 +7,11 @@ import com.hrothwell.anime.commands.*
 object Main {
   @JvmStatic
   fun main(args: Array<String>) {
-    Anime().subcommands(Login(), Random(), Suggest(), Refresh()).main(args)
+    Anime().subcommands(
+      Login(),
+      Random(),
+      Suggest(),
+      Refresh(),
+    ).main(args)
   }
 }

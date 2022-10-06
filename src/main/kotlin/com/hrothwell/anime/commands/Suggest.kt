@@ -27,6 +27,6 @@ class Suggest: CliktCommand(
   }
 
   private fun echoError(msg: String) {
-    echo("${AnimeUtil.RED} $msg", err = true)
+    echo("${AnimeUtil.RED} $msg ${AnimeUtil.RESET}", err = true)
   }
 }

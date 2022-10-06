@@ -9,6 +9,14 @@
   "name":"[Lsun.security.pkcs.SignerInfo;"
 },
 {
+  "name":"com.hrothwell.anime.domain.MALAnimeListResponse",
+  "fields":[{"name":"Companion"}]
+},
+{
+  "name":"com.hrothwell.anime.domain.MALAnimeListResponse$Companion",
+  "methods":[{"name":"serializer","parameterTypes":[] }]
+},
+{
   "name":"com.hrothwell.anime.domain.MALOAuthResponse",
   "fields":[{"name":"Companion"}]
 },

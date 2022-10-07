@@ -28,14 +28,14 @@ class Random: CliktCommand(
   ).choice(choices = possibleListStatusValues)
     .default("plan_to_watch")
 
-  private val excludeNotYetAired by option("--include-not-yet-aired", help = """
+  private val includeNotYetAired by option("--include-not-yet-aired", help = """
     include anime that have not yet aired, default to exclude
   """.trimIndent())
     .flag("--exclude-not-yet-aired", default = false)
 
   override fun run() {
     try{
-      echo(MALClient.getRandomAnime(user, list, excludeNotYetAired))
+      echo(MALClient.getRandomAnime(user, list, includeNotYetAired))
     } catch(t: Throwable){
       echoError("""
         Unable to retrieve random anime. Message: ${t.message}

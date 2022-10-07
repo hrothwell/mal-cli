@@ -17,6 +17,7 @@ call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar random --include-not-yet-aired
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar random -u hone_the_rat -l completed
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar random -u unknown_user_113355_idk_error -l completed
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\anime-cli-1.0-SNAPSHOT-all.jar search -q "Tokyo Ghoul" -l 2
 echo config files located here "%configPath%"
 set exeBuildResultPath=%root%native-image-items\build-results
 mkdir %exeBuildResultPath%

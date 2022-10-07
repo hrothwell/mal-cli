@@ -11,6 +11,7 @@ object Main {
       Random(),
       Suggest(),
       Refresh(),
+      Search()
     ).main(args)
   }
 }

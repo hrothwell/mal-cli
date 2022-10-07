@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.result.Result
 import com.hrothwell.anime.commands.Anime
 import com.hrothwell.anime.domain.AiringStatus
+import com.hrothwell.anime.domain.Data
 import com.hrothwell.anime.domain.MALOAuthResponse
 import com.hrothwell.anime.domain.MALAnimeListResponse
 import com.hrothwell.anime.exception.OAuthCallException
@@ -23,7 +24,6 @@ class MALClient {
       AnimeUtil.printDebug("getRandomAnime - enter")
       val clientSecrets = FileUtil.getUserSecrets()
 
-      val headers = "X-MAL-CLIENT-ID" to clientSecrets.client_id
       val listStatus = "status" to list
       val limit = "limit" to 1000
       val userPathParam = user ?: clientSecrets.user_name
@@ -31,20 +31,31 @@ class MALClient {
 
       val request =
         Fuel.get(path = "https://api.myanimelist.net/v2/users/$userPathParam/animelist", parameters = listOf(listStatus, limit, fields))
-          .appendHeader(headers)
 
-      AnimeUtil.printDebug("getRandomAnime - calling to get response and handle http errors")
-      val response = request.response()
-      AnimeUtil.handlePotentialHttpErrors(response.second)
+      val json = callWithClientId(request).get()
 
       AnimeUtil.printDebug("getRandomAnime - decoding MAL response")
-      val json = String(response.third.get())
       val result = FileUtil.jsonReader.decodeFromString<MALAnimeListResponse>(json)
       val animeTitle = result.data.filter{ it.node.status != AiringStatus.not_yet_aired || includeNotYetAired }
         .randomOrNull()?.node?.title
       return animeTitle?.let{
         "Random selection: $it"
       } ?: "$userPathParam's $list was empty"
+    }
+
+    fun getAnimeList(query: String, limit: String): List<String>{
+      AnimeUtil.printDebug("getAnimeList - enter")
+      val q = "q" to query
+      val limitParam = "limit" to limit
+      val params = listOf(q, limitParam)
+      val url = "https://api.myanimelist.net/v2/anime"
+
+      val request = Fuel.get(url, parameters = params)
+      val json = callWithClientId(request).get()
+      val result = FileUtil.jsonReader.decodeFromString<MALAnimeListResponse>(json)
+
+      AnimeUtil.printDebug("getAnimeList - exit")
+      return result.data.map{ it.node.title }
     }
 
     /**
@@ -64,6 +75,16 @@ class MALClient {
       return malAnimeListResponse.data.map{
         it.node.title
       }
+    }
+
+    private fun callWithClientId(request: Request): Result<String, FuelError>{
+      AnimeUtil.printDebug("callWithClientId - enter")
+      val clientSecrets = FileUtil.getUserSecrets()
+      val header = "X-MAL-CLIENT-ID" to clientSecrets.client_id
+      AnimeUtil.printDebug("callWithClientId - get response")
+      val response = request.appendHeader(header).responseString()
+      AnimeUtil.handlePotentialHttpErrors(response.second)
+      return response.third
     }
 
     private fun callWithOauth(originalRequest: Request): Result<String, FuelError> {

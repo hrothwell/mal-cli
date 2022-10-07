@@ -3,6 +3,7 @@ package com.hrothwell.anime.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
 import com.hrothwell.anime.client.MALClient
 import com.hrothwell.anime.util.AnimeUtil
 
@@ -13,8 +14,8 @@ class Search: CliktCommand(
 ) {
 
   private val keywords by option("-q", "--query", help = """
-    search terms to use, surrounded mutliple words in quotes: "Tokyo Ghoul" or 'Tokyo Ghoul'
-  """.trimIndent()).default("Made in Abyss")
+    search terms to use, surround multiple words in quotes: "Tokyo Ghoul" or 'Tokyo Ghoul'
+  """.trimIndent()).required()
   private val limit by option("-l", "--limit", help = """
     limit of items to return from the search. MAL limits to 100
   """.trimIndent()).default("1")

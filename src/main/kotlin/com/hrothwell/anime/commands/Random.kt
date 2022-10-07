@@ -2,6 +2,7 @@ package com.hrothwell.anime.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.hrothwell.anime.client.MALClient
@@ -27,9 +28,14 @@ class Random: CliktCommand(
   ).choice(choices = possibleListStatusValues)
     .default("plan_to_watch")
 
+  private val includeNotYetAired by option("--include-not-yet-aired", help = """
+    include anime that have not yet aired, default to exclude
+  """.trimIndent())
+    .flag("--exclude-not-yet-aired", default = false)
+
   override fun run() {
     try{
-      echo(MALClient.getRandomAnime(user, list))
+      echo(MALClient.getRandomAnime(user, list, includeNotYetAired))
     } catch(t: Throwable){
       echoError("""
         Unable to retrieve random anime. Message: ${t.message}

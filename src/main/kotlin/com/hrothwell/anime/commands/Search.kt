@@ -16,6 +16,7 @@ class Search: CliktCommand(
   private val keywords by option("-q", "--query", help = """
     search terms to use, surround multiple words in quotes: "Tokyo Ghoul" or 'Tokyo Ghoul'
   """.trimIndent()).required()
+
   private val limit by option("-l", "--limit", help = """
     limit of items to return from the search. MAL limits to 100
   """.trimIndent()).default("1")

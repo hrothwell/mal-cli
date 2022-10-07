@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.result.Result
 import com.hrothwell.anime.commands.Anime
+import com.hrothwell.anime.domain.AiringStatus
 import com.hrothwell.anime.domain.MALOAuthResponse
 import com.hrothwell.anime.domain.MALAnimeListResponse
 import com.hrothwell.anime.exception.OAuthCallException
@@ -18,7 +19,7 @@ import kotlinx.serialization.decodeFromString
 class MALClient {
   companion object{
 
-    fun getRandomAnime(user: String?, list: String): String {
+    fun getRandomAnime(user: String?, list: String, includeNotYetAired: Boolean): String {
       AnimeUtil.printDebug("getRandomAnime - enter")
       val clientSecrets = FileUtil.getUserSecrets()
 
@@ -26,9 +27,10 @@ class MALClient {
       val listStatus = "status" to list
       val limit = "limit" to 1000
       val userPathParam = user ?: clientSecrets.user_name
+      val fields = "fields" to "status"
 
       val request =
-        Fuel.get(path = "https://api.myanimelist.net/v2/users/$userPathParam/animelist", parameters = listOf(listStatus, limit))
+        Fuel.get(path = "https://api.myanimelist.net/v2/users/$userPathParam/animelist", parameters = listOf(listStatus, limit, fields))
           .appendHeader(headers)
 
       AnimeUtil.printDebug("getRandomAnime - calling to get response and handle http errors")
@@ -38,7 +40,8 @@ class MALClient {
       AnimeUtil.printDebug("getRandomAnime - decoding MAL response")
       val json = String(response.third.get())
       val result = FileUtil.jsonReader.decodeFromString<MALAnimeListResponse>(json)
-      val animeTitle = result.data.randomOrNull()?.node?.title
+      val animeTitle = result.data.filter{ it.node.status != AiringStatus.not_yet_aired || includeNotYetAired }
+        .randomOrNull()?.node?.title
       return animeTitle?.let{
         "Random selection: $it"
       } ?: "$userPathParam's $list was empty"

@@ -5,14 +5,13 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.result.Result
 import com.hrothwell.anime.commands.Anime
-import com.hrothwell.anime.domain.AiringStatus
-import com.hrothwell.anime.domain.Data
-import com.hrothwell.anime.domain.MALOAuthResponse
-import com.hrothwell.anime.domain.MALAnimeListResponse
+import com.hrothwell.anime.domain.*
 import com.hrothwell.anime.exception.OAuthCallException
 import com.hrothwell.anime.util.AnimeUtil
+import com.hrothwell.anime.util.AnimeUtil.Companion.openAnime
 import com.hrothwell.anime.util.FileUtil
 import kotlinx.serialization.decodeFromString
+import kotlin.math.absoluteValue
 
 /**
  * Client for all calls that are NOT part of the authorization flow (for now)
@@ -20,7 +19,7 @@ import kotlinx.serialization.decodeFromString
 class MALClient {
   companion object{
 
-    fun getRandomAnime(user: String?, list: String, includeNotYetAired: Boolean): String {
+    fun getRandomAnime(user: String?, list: String, includeNotYetAired: Boolean): Node? {
       AnimeUtil.printDebug("getRandomAnime - enter")
       val clientSecrets = FileUtil.getUserSecrets()
 
@@ -36,17 +35,15 @@ class MALClient {
 
       AnimeUtil.printDebug("getRandomAnime - decoding MAL response")
       val result = FileUtil.jsonReader.decodeFromString<MALAnimeListResponse>(json)
-      val animeTitle = result.data.filter{ it.node.status != AiringStatus.not_yet_aired || includeNotYetAired }
-        .randomOrNull()?.node?.title
-      return animeTitle?.let{
-        "Random selection: $it"
-      } ?: "$userPathParam's $list was empty"
+
+      return result.data.filter{ it.node.status != AiringStatus.not_yet_aired || includeNotYetAired }
+        .randomOrNull()?.node
     }
 
-    fun getAnimeList(query: String, limit: String): List<String>{
+    fun getAnimeList(query: String, limit: Int): List<Node>{
       AnimeUtil.printDebug("getAnimeList - enter")
       val q = "q" to query
-      val limitParam = "limit" to limit
+      val limitParam = "limit" to limit.absoluteValue
       val params = listOf(q, limitParam)
       val url = "https://api.myanimelist.net/v2/anime"
 
@@ -55,15 +52,15 @@ class MALClient {
       val result = FileUtil.jsonReader.decodeFromString<MALAnimeListResponse>(json)
 
       AnimeUtil.printDebug("getAnimeList - exit")
-      return result.data.map{ it.node.title }
+      return result.data.map{ it.node }
     }
 
     /**
      * MAL api seems to return the same item when you set this to one, so could just always pull 100 and randomize it
      */
-    fun getSuggestedAnime(limit: String): List<String> {
+    fun getSuggestedAnime(limit: Int): List<Node> {
       AnimeUtil.printDebug("getSuggestedAnime - enter")
-      val limitToUse = if(limit.toInt() > 100) "100" else limit
+      val limitToUse = if(limit.absoluteValue > 100) 100 else limit.absoluteValue
       val url = "https://api.myanimelist.net/v2/anime/suggestions?limit=$limitToUse"
 
       AnimeUtil.printDebug("getSuggestedAnime - calling callWithOauth")
@@ -73,7 +70,7 @@ class MALClient {
       AnimeUtil.printDebug("getSuggestedAnime - decoding MAL response")
       val malAnimeListResponse = FileUtil.jsonReader.decodeFromString<MALAnimeListResponse>(jsonResult)
       return malAnimeListResponse.data.map{
-        it.node.title
+        it.node
       }
     }
 

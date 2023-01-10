@@ -1,6 +1,7 @@
 package com.hrothwell.anime.util
 
 import com.github.kittinunf.fuel.core.Response
+import com.hrothwell.anime.domain.Node
 import com.hrothwell.anime.exception.MALResponseException
 import kotlin.system.exitProcess
 
@@ -36,6 +37,31 @@ class AnimeUtil {
       if(debug){
         println(msg)
       }
+    }
+
+    fun openUrl(url: String){
+      try{
+        // use cmd if on windows to just open it
+        if(System.getProperty("os.name").lowercase().contains("windows")){
+          Runtime.getRuntime().exec("""
+        cmd.exe /c start "" "$url"
+      """.trimIndent())
+        }
+        // TODO will need to test if this actually works on mac (developing on Windows)
+        else{
+          Runtime.getRuntime().exec("""
+            open "$url"
+          """.trimIndent())
+        }
+      } catch(t: Throwable){
+        System.err.println("couldn't open url, $t")
+      }
+    }
+
+    // Should maybe move under MALClient? doesn't interact with the same API though
+    fun openAnime(anime: Node?){
+      if(anime == null) return
+      openUrl("https://myanimelist.net/anime/${anime.id}")
     }
   }
 }

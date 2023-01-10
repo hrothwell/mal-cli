@@ -1,6 +1,7 @@
 package com.hrothwell.anime.util
 
 import com.github.kittinunf.fuel.core.Response
+import com.hrothwell.anime.domain.Node
 import com.hrothwell.anime.exception.MALResponseException
 import kotlin.system.exitProcess
 
@@ -55,6 +56,12 @@ class AnimeUtil {
       } catch(t: Throwable){
         System.err.println("couldn't open url, $t")
       }
+    }
+
+    // Should maybe move under MALClient? doesn't interact with the same API though
+    fun openAnime(anime: Node?){
+      if(anime == null) return
+      openUrl("https://myanimelist.net/anime/${anime.id}")
     }
   }
 }

@@ -37,5 +37,24 @@ class AnimeUtil {
         println(msg)
       }
     }
+
+    fun openUrl(url: String){
+      try{
+        // use cmd if on windows to just open it
+        if(System.getProperty("os.name").lowercase().contains("windows")){
+          Runtime.getRuntime().exec("""
+        cmd.exe /c start "" "$url"
+      """.trimIndent())
+        }
+        // TODO will need to test if this actually works on mac (developing on Windows)
+        else{
+          Runtime.getRuntime().exec("""
+            open "$url"
+          """.trimIndent())
+        }
+      } catch(t: Throwable){
+        System.err.println("couldn't open url, $t")
+      }
+    }
   }
 }

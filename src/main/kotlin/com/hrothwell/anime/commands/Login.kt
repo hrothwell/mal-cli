@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.hrothwell.anime.domain.MALOAuthResponse
 import com.hrothwell.anime.exception.LoginException
 import com.hrothwell.anime.util.AnimeUtil
+import com.hrothwell.anime.util.AnimeUtil.Companion.openUrl
 import com.hrothwell.anime.util.FileUtil
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
@@ -56,7 +57,9 @@ class Login: CliktCommand(
     val grantType = "grant_type=authorization_code"
 
     val userAuthUrl = "https://myanimelist.net/v1/oauth2/authorize?$grantType&$responseType&$clientId&$redirectUri&$codeChallenge"
-    echo("Open this URL to authenticate with MAL: $userAuthUrl")
+    echo("If it does not open automatically, use this URL to authenticate with MAL: $userAuthUrl")
+
+    openUrl(userAuthUrl)
 
     // user goes to MAL via link, authorizes, hits MALOAuthHttpHandler which updates secrets file
 

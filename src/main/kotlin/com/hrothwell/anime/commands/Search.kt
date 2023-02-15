@@ -6,7 +6,6 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.hrothwell.anime.client.MALClient
 import com.hrothwell.anime.util.AnimeUtil
-import com.hrothwell.anime.util.AnimeUtil.Companion.openAnime
 
 class Search: CliktCommand(
   help = """
@@ -27,7 +26,7 @@ class Search: CliktCommand(
       val animeList = MALClient.getAnimeList(keywords, limit.toInt())
       echo(animeList.map{ it.title })
       if(animeList.size == 1){
-        openAnime(animeList.first())
+        AnimeUtil.openAnime(animeList.first())
       }
     } catch(t: Throwable){
       echoError("""

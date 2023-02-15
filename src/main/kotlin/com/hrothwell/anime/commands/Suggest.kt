@@ -5,7 +5,6 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.hrothwell.anime.client.MALClient
 import com.hrothwell.anime.util.AnimeUtil
-import com.hrothwell.anime.util.AnimeUtil.Companion.openAnime
 
 class Suggest: CliktCommand(
   help = "Get anime suggestions!"
@@ -21,7 +20,7 @@ class Suggest: CliktCommand(
       val animeList = MALClient.getSuggestedAnime(limit.toInt())
       echo("Try: ${animeList.map{it.title}}")
       if(animeList.size == 1){
-        openAnime(animeList.first())
+        AnimeUtil.openAnime(animeList.first())
       }
     } catch(t: Throwable){
       echoError("""

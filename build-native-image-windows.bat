@@ -4,6 +4,9 @@ call %root%gradlew.bat clean build
 echo making config directory
 mkdir %root%build\libs\META-INF\native-image
 set configPath=%root%native-image-items\config
+@REM remove the config folder if it already existed as the merge-dir stuff can leave some unwanted remnants from prior builds
+echo removing config directory if it exists already
+rmdir /s %configPath%
 echo running agentlib
 @REM no args for base command, then add all subcommands also. potentially will need to run with any arguments also?
 @REM login process will be kind of annoying/tedious to hit

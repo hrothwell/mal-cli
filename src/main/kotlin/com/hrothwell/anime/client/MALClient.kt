@@ -4,11 +4,9 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.result.Result
-import com.hrothwell.anime.commands.Anime
 import com.hrothwell.anime.domain.*
 import com.hrothwell.anime.exception.OAuthCallException
 import com.hrothwell.anime.util.AnimeUtil
-import com.hrothwell.anime.util.AnimeUtil.Companion.openAnime
 import com.hrothwell.anime.util.FileUtil
 import kotlinx.serialization.decodeFromString
 import kotlin.math.absoluteValue

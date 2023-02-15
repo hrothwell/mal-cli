@@ -25,14 +25,6 @@
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {
-  "name":"com.hrothwell.anime.domain.MALUserListResponse",
-  "fields":[{"name":"Companion"}]
-},
-{
-  "name":"com.hrothwell.anime.domain.MALUserListResponse$Companion",
-  "methods":[{"name":"serializer","parameterTypes":[] }]
-},
-{
   "name":"com.hrothwell.anime.domain.UserSecrets",
   "fields":[{"name":"Companion"}]
 },

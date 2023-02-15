@@ -8,7 +8,6 @@ import com.github.ajalt.clikt.parameters.types.choice
 import com.hrothwell.anime.client.MALClient
 import com.hrothwell.anime.domain.ListStatus
 import com.hrothwell.anime.util.AnimeUtil
-import com.hrothwell.anime.util.AnimeUtil.Companion.openAnime
 import com.hrothwell.anime.util.FileUtil
 
 class Random: CliktCommand(
@@ -39,7 +38,7 @@ class Random: CliktCommand(
       val anime = MALClient.getRandomAnime(user, list, includeNotYetAired)
       val title = if(anime != null) "Random selection: ${anime.title}" else "$user's list was empty"
       echo(title)
-      openAnime(anime)
+      AnimeUtil.openAnime(anime)
     } catch(t: Throwable){
       echoError("""
         Unable to retrieve random anime. Message: ${t.message}

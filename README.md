@@ -26,5 +26,5 @@ extended user guide, source code, etc - https://github.com/hrothwell/anime-cli
 
 ## Latest Windows native exe
 - Latest windows exe build can be found [here](./native-image-items/build-results/anime.exe)
-- I am trying to only ever merge completely functional/working native-image code, but no promises this will always work. More automated testing to come
+- I am trying to only ever merge completely functional/working native-image code, but no promises this will always work. More automated testing to come, maybe...
 - Ideally get versioning setup as well

@@ -1,7 +1,7 @@
 package com.hrothwell.anime.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.hrothwell.anime.client.MALClient
+import com.hrothwell.anime.client.MalAnimeClient
 import com.hrothwell.anime.util.AnimeUtil
 
 class Refresh : CliktCommand(
@@ -11,7 +11,7 @@ class Refresh : CliktCommand(
   override fun run() {
     echo("refreshing tokens")
     try {
-      MALClient.refreshOAuthToken()
+      MalAnimeClient.refreshOAuthToken()
     } catch (t: Throwable) {
       echoError(
         """

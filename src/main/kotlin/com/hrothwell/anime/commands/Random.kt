@@ -5,8 +5,8 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
-import com.hrothwell.anime.client.MALClient
-import com.hrothwell.anime.domain.AnimeListStatus
+import com.hrothwell.anime.client.MalAnimeClient
+import com.hrothwell.anime.domain.mal.AnimeListStatus
 import com.hrothwell.anime.util.AnimeUtil
 import com.hrothwell.anime.util.FileUtil
 
@@ -39,7 +39,7 @@ class Random : CliktCommand(
 
   override fun run() {
     try {
-      val anime = MALClient.getRandomAnime(user, list, includeNotYetAired)
+      val anime = MalAnimeClient.getRandomAnime(user, list, includeNotYetAired)
       val title = if (anime != null) "Random selection: ${anime.title}" else "$user's list was empty"
       echo(title)
       AnimeUtil.openAnime(anime)

@@ -2,7 +2,7 @@ package com.hrothwell.anime.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kittinunf.fuel.Fuel
-import com.hrothwell.anime.domain.mal.MALOAuthResponse
+import com.hrothwell.anime.domain.mal.MalOAuthResponse
 import com.hrothwell.anime.exception.LoginException
 import com.hrothwell.anime.util.AnimeUtil
 import com.hrothwell.anime.util.AnimeUtil.Companion.openUrl
@@ -98,7 +98,7 @@ class Login : CliktCommand(
 
     AnimeUtil.printDebug("exchangeAuthCode - deconde response")
     val tokenJson = String(tokenResult.third.get())
-    val tokenResponse = FileUtil.jsonReader.decodeFromString<MALOAuthResponse>(tokenJson)
+    val tokenResponse = FileUtil.jsonReader.decodeFromString<MalOAuthResponse>(tokenJson)
     val updatedSecrets = secrets.copy(oauthTokens = tokenResponse)
 
     FileUtil.updateUserSecrets(updatedSecrets)

@@ -4,7 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import com.hrothwell.anime.client.MALClient
+import com.hrothwell.anime.client.MalAnimeClient
 import com.hrothwell.anime.util.AnimeUtil
 
 class Search : CliktCommand(
@@ -27,7 +27,7 @@ class Search : CliktCommand(
 
   override fun run() {
     try {
-      val animeList = MALClient.getAnimeList(keywords, limit.toInt())
+      val animeList = MalAnimeClient.getAnimeList(keywords, limit.toInt())
       echo(animeList.map { it.title })
       if (animeList.size == 1) {
         AnimeUtil.openAnime(animeList.first())

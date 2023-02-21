@@ -1,8 +1,11 @@
-package com.hrothwell.anime.domain
+package com.hrothwell.anime.domain.mal
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Status in a user's list
+ */
 @Serializable
 enum class AnimeListStatus(val malValue: String) {
   @SerialName("completed")

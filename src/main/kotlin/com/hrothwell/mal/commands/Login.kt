@@ -21,7 +21,7 @@ class Login : CliktCommand(
   """.trimIndent()
 ) {
 
-  private val redirectUrl = "http://localhost:8080/anime"
+  private val redirectUrl = "http://localhost:8080/mal"
   override fun run() {
     try {
       login()
@@ -46,7 +46,7 @@ class Login : CliktCommand(
 
     MalUtil.printDebug("login - starting local server")
     val localServer = HttpServer.create()
-    localServer.createContext("/anime", MALOAuthHttpHandler())
+    localServer.createContext("/mal", MALOAuthHttpHandler())
     localServer.bind(InetSocketAddress(8080), 0)
     localServer.start()
 

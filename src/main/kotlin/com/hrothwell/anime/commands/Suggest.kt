@@ -6,27 +6,31 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.hrothwell.anime.client.MALClient
 import com.hrothwell.anime.util.AnimeUtil
 
-class Suggest: CliktCommand(
+class Suggest : CliktCommand(
   help = "Get anime suggestions!"
 ) {
 
-  val limit by option("-l", "--limit", help = """
+  val limit by option(
+    "-l", "--limit", help = """
     limit on the amount of anime to suggest. Default 1, max 100
-  """.trimIndent())
+  """.trimIndent()
+  )
     .default("1")
 
   override fun run() {
-    try{
+    try {
       val animeList = MALClient.getSuggestedAnime(limit.toInt())
-      echo("Try: ${animeList.map{it.title}}")
-      if(animeList.size == 1){
+      echo("Try: ${animeList.map { it.title }}")
+      if (animeList.size == 1) {
         AnimeUtil.openAnime(animeList.first())
       }
-    } catch(t: Throwable){
-      echoError("""
+    } catch (t: Throwable) {
+      echoError(
+        """
         unable to suggest anime. Message: ${t.message}
         cause: ${t.cause}
-      """.trimIndent())
+      """.trimIndent()
+      )
     }
   }
 

@@ -1,19 +1,17 @@
 package com.hrothwell.anime.util
 
-import com.hrothwell.anime.commands.Anime
 import com.hrothwell.anime.domain.UserSecrets
 import com.hrothwell.anime.exception.UserSecretsException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
-import kotlin.system.exitProcess
 
 class FileUtil {
-  companion object{
+  companion object {
     val home = System.getProperty("user.home")
     private val secretLocation = "$home/anime-cli/mal-secret.json"
-    val jsonReader = Json{ignoreUnknownKeys = true}
+    val jsonReader = Json { ignoreUnknownKeys = true }
 
     fun getUserSecrets(): UserSecrets {
       AnimeUtil.printDebug("getUserSecrets - enter")
@@ -23,7 +21,8 @@ class FileUtil {
         AnimeUtil.printDebug("getUserSecrets - decode secret")
         jsonReader.decodeFromString<UserSecrets>(clientSecretsJsonContent)
       } catch (t: Throwable) {
-        throw UserSecretsException("""
+        throw UserSecretsException(
+          """
           ERROR trying to get secrets from companion object function
           
           Error getting mal-secret.json
@@ -33,24 +32,27 @@ class FileUtil {
           "client_id": "my MAL API client ID"
         }
           
-        """.trimIndent(), t)
+        """.trimIndent(), t
+        )
       }
     }
 
     /**
      * TODO this and other file methods could use testing probably. Testing in general would be nice to have
      */
-    fun updateUserSecrets(userSecrets: UserSecrets){
+    fun updateUserSecrets(userSecrets: UserSecrets) {
       AnimeUtil.printDebug("updateUserSecrets - enter")
-      try{
+      try {
         AnimeUtil.printDebug("updateUserSecrets - encoding new user secrets")
         val newUserSecretsJson = jsonReader.encodeToString(userSecrets)
         AnimeUtil.printDebug("updateUserSecrets - writing new secrets to file")
         File(secretLocation).writeText(newUserSecretsJson)
-      } catch(t: Throwable){
-        throw UserSecretsException("""
+      } catch (t: Throwable) {
+        throw UserSecretsException(
+          """
           Error updating secrets
-        """.trimIndent(), t)
+        """.trimIndent(), t
+        )
       }
     }
   }

@@ -1,4 +1,4 @@
-[![Gradle Build](https://github.com/hrothwell/anime-cli/actions/workflows/gradle.yml/badge.svg)](https://github.com/hrothwell/anime-cli/actions/workflows/gradle.yml)
+[![Gradle Build](https://github.com/hrothwell/mal-cli/actions/workflows/gradle.yml/badge.svg)](https://github.com/hrothwell/mal-cli/actions/workflows/gradle.yml)
 
 # mal-cli
 

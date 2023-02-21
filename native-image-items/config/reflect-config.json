@@ -9,35 +9,43 @@
   "name":"[Lsun.security.pkcs.SignerInfo;"
 },
 {
-  "name":"com.hrothwell.anime.domain.UserSecrets",
+  "name":"com.hrothwell.mal.domain.UserSecrets",
   "fields":[{"name":"Companion"}]
 },
 {
-  "name":"com.hrothwell.anime.domain.UserSecrets$Companion",
+  "name":"com.hrothwell.mal.domain.UserSecrets$Companion",
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.AnimeData",
+  "name":"com.hrothwell.mal.domain.response.AnimeData",
   "fields":[{"name":"Companion"}]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.AnimeData$Companion",
+  "name":"com.hrothwell.mal.domain.response.AnimeData$Companion",
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MalGenericListResponse",
+  "name":"com.hrothwell.mal.domain.response.MalGenericListResponse",
   "fields":[{"name":"Companion"}]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MalGenericListResponse$Companion",
+  "name":"com.hrothwell.mal.domain.response.MalGenericListResponse$Companion",
   "methods":[{"name":"serializer","parameterTypes":["kotlinx.serialization.KSerializer"] }]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MalOAuthResponse",
+  "name":"com.hrothwell.mal.domain.response.MalOAuthResponse",
   "fields":[{"name":"Companion"}]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MalOAuthResponse$Companion",
+  "name":"com.hrothwell.mal.domain.response.MalOAuthResponse$Companion",
+  "methods":[{"name":"serializer","parameterTypes":[] }]
+},
+{
+  "name":"com.hrothwell.mal.domain.response.MangaData",
+  "fields":[{"name":"Companion"}]
+},
+{
+  "name":"com.hrothwell.mal.domain.response.MangaData$Companion",
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {

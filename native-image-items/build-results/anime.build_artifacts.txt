@@ -1,6 +1,0 @@
-[EXECUTABLE]
-anime.exe
-
-[JDK_LIB]
-sunmscapi.dll
-

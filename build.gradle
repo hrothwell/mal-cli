@@ -12,13 +12,13 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = "com.hrothwell.anime.Main"
+mainClassName = "com.hrothwell.mal.Main"
 
 application {
-    mainClass.set("com.hrothwell.anime.Main")
+    mainClass.set("com.hrothwell.mal.Main")
 }
 
-run{
+run {
     standardInput = System.in
 }
 
@@ -26,7 +26,7 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(
-                'Main-Class': 'com.hrothwell.anime.Main'
+                'Main-Class': 'com.hrothwell.mal.Main'
         )
     }
     exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'

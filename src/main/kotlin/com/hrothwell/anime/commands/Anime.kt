@@ -11,12 +11,15 @@ class Anime : CliktCommand(
     extended user guide, source code, report issues, etc - https://github.com/hrothwell/anime-cli
   """.trimIndent()
 ) {
-  val debug by option("--debug", help = """
+  val debug by option(
+    "--debug", help = """
     run in debug mode and get more log output
-  """.trimIndent()).flag("--no-debug", default = false)
-  override fun run(){
+  """.trimIndent()
+  ).flag("--no-debug", default = false)
+
+  override fun run() {
     AnimeUtil.debug = debug
-    if(AnimeUtil.debug){
+    if (AnimeUtil.debug) {
       echo("debug is on")
     }
   }

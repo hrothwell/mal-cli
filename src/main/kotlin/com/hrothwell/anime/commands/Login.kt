@@ -2,7 +2,7 @@ package com.hrothwell.anime.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.kittinunf.fuel.Fuel
-import com.hrothwell.anime.domain.MALOAuthResponse
+import com.hrothwell.anime.domain.mal.MALOAuthResponse
 import com.hrothwell.anime.exception.LoginException
 import com.hrothwell.anime.util.AnimeUtil
 import com.hrothwell.anime.util.AnimeUtil.Companion.openUrl
@@ -15,7 +15,7 @@ import java.net.InetSocketAddress
 import kotlin.random.Random
 import kotlin.system.exitProcess
 
-class Login: CliktCommand(
+class Login : CliktCommand(
   help = """
     Login/authorize this app to have more access to MAL API
   """.trimIndent()
@@ -23,22 +23,24 @@ class Login: CliktCommand(
 
   private val redirectUrl = "http://localhost:8080/anime"
   override fun run() {
-    try{
+    try {
       login()
-    } catch(t: Throwable){
-      echoError("""
+    } catch (t: Throwable) {
+      echoError(
+        """
         Error logging in. Message: ${t.message}
         Cause: ${t.cause}
-      """.trimIndent())
+      """.trimIndent()
+      )
       exitProcess(1)
     }
   }
 
-  private fun login(){
+  private fun login() {
     AnimeUtil.printDebug("login - enter")
     val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9') + listOf('-', '.', '_', '~')
     val pkceCodeVerifier = (1..100)
-      .map{ Random.nextInt(0, charPool.size)}
+      .map { Random.nextInt(0, charPool.size) }
       .map(charPool::get)
       .joinToString("")
 
@@ -51,22 +53,23 @@ class Login: CliktCommand(
     AnimeUtil.printDebug("login - building user auth url")
     val userSecrets = FileUtil.getUserSecrets()
     val responseType = "response_type=code"
-    val clientId = "client_id=${userSecrets.client_id}"
+    val clientId = "client_id=${userSecrets.clientId}"
     val codeChallenge = "code_challenge=$pkceCodeVerifier"
     val redirectUri = "redirect_uri=$redirectUrl"
     val grantType = "grant_type=authorization_code"
 
-    val userAuthUrl = "https://myanimelist.net/v1/oauth2/authorize?$grantType&$responseType&$clientId&$redirectUri&$codeChallenge"
+    val userAuthUrl =
+      "https://myanimelist.net/v1/oauth2/authorize?$grantType&$responseType&$clientId&$redirectUri&$codeChallenge"
     echo("If it does not open automatically, use this URL to authenticate with MAL: $userAuthUrl")
 
     openUrl(userAuthUrl)
 
     // user goes to MAL via link, authorizes, hits MALOAuthHttpHandler which updates secrets file
 
-    if(confirm("Did you approve the application?", default = false, showDefault = true) == true){
+    if (confirm("Did you approve the application?", default = false, showDefault = true) == true) {
       localServer.stop(0)
       exchangeAuthCode(pkceCodeVerifier)
-    } else{
+    } else {
       throw LoginException("Login process terminated by user")
     }
   }
@@ -75,15 +78,15 @@ class Login: CliktCommand(
    * Exchange oauth_authorization_code and code_verifier for Oauth token
    * After getting token information, update secrets
    */
-  private fun exchangeAuthCode(pkceCodeVerifier: String){
+  private fun exchangeAuthCode(pkceCodeVerifier: String) {
     AnimeUtil.printDebug("exchangeAuthCode - enter")
     val secrets = FileUtil.getUserSecrets()
 
     AnimeUtil.printDebug("exchangeAuthCode - building request")
     val redirect = "redirect_uri" to redirectUrl
-    val clientId = "client_id" to secrets.client_id
+    val clientId = "client_id" to secrets.clientId
     val grantType = "grant_type" to "authorization_code"
-    val code = "code" to secrets.oauth_authorization_code
+    val code = "code" to secrets.oauthAuthorizationCode
     val codeVerifier = "code_verifier" to pkceCodeVerifier
     val params = listOf(clientId, grantType, codeVerifier, code, redirect)
 
@@ -96,7 +99,7 @@ class Login: CliktCommand(
     AnimeUtil.printDebug("exchangeAuthCode - deconde response")
     val tokenJson = String(tokenResult.third.get())
     val tokenResponse = FileUtil.jsonReader.decodeFromString<MALOAuthResponse>(tokenJson)
-    val updatedSecrets = secrets.copy(oauth_tokens = tokenResponse)
+    val updatedSecrets = secrets.copy(oauthTokens = tokenResponse)
 
     FileUtil.updateUserSecrets(updatedSecrets)
   }
@@ -104,16 +107,17 @@ class Login: CliktCommand(
   private fun echoError(msg: String) {
     echo("${AnimeUtil.RED} $msg ${AnimeUtil.RESET}", err = true)
   }
-  private class MALOAuthHttpHandler: HttpHandler {
+
+  private class MALOAuthHttpHandler : HttpHandler {
     override fun handle(exchange: HttpExchange?) {
-      try{
+      try {
         AnimeUtil.printDebug("MALOAuthHttpHandler.handle - enter")
 
         val uri = exchange?.requestURI!!
         val params = queryStringToMap(uri.query)
         val oauthAuthorizationCode = params["code"]!!
         val userSecrets = FileUtil.getUserSecrets()
-        val updatedSecrets = userSecrets.copy(oauth_authorization_code = oauthAuthorizationCode)
+        val updatedSecrets = userSecrets.copy(oauthAuthorizationCode = oauthAuthorizationCode)
         FileUtil.updateUserSecrets(updatedSecrets)
         exchange.sendResponseHeaders(200, 0)
         val outStream = exchange.responseBody
@@ -121,20 +125,20 @@ class Login: CliktCommand(
 
         AnimeUtil.printDebug("MALOAuthHttpHandler.handle - exit")
         exchange.close()
-      } catch(t: Throwable){
+      } catch (t: Throwable) {
         throw LoginException("Error handling http request response from MAL during login process", t)
       }
     }
 
-    private fun queryStringToMap(queryString: String): Map<String, String>{
+    private fun queryStringToMap(queryString: String): Map<String, String> {
       AnimeUtil.printDebug("MALOAuthHttpHandler.queryStringToMap - enter")
       val params = queryString.split("&")
       val queryMap = mutableMapOf<String, String>()
-      params.forEach{
+      params.forEach {
         val keyValue = it.split("=")
-        if(keyValue.size > 1){
+        if (keyValue.size > 1) {
           queryMap[keyValue[0]] = keyValue[1]
-        } else{
+        } else {
           queryMap[keyValue[0]] = ""
         }
       }

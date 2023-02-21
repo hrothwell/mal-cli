@@ -9,27 +9,27 @@
   "name":"[Lsun.security.pkcs.SignerInfo;"
 },
 {
-  "name":"com.hrothwell.anime.domain.MALAnimeListResponse",
-  "fields":[{"name":"Companion"}]
-},
-{
-  "name":"com.hrothwell.anime.domain.MALAnimeListResponse$Companion",
-  "methods":[{"name":"serializer","parameterTypes":[] }]
-},
-{
-  "name":"com.hrothwell.anime.domain.MALOAuthResponse",
-  "fields":[{"name":"Companion"}]
-},
-{
-  "name":"com.hrothwell.anime.domain.MALOAuthResponse$Companion",
-  "methods":[{"name":"serializer","parameterTypes":[] }]
-},
-{
   "name":"com.hrothwell.anime.domain.UserSecrets",
   "fields":[{"name":"Companion"}]
 },
 {
   "name":"com.hrothwell.anime.domain.UserSecrets$Companion",
+  "methods":[{"name":"serializer","parameterTypes":[] }]
+},
+{
+  "name":"com.hrothwell.anime.domain.mal.MALAnimeListResponse",
+  "fields":[{"name":"Companion"}]
+},
+{
+  "name":"com.hrothwell.anime.domain.mal.MALAnimeListResponse$Companion",
+  "methods":[{"name":"serializer","parameterTypes":[] }]
+},
+{
+  "name":"com.hrothwell.anime.domain.mal.MALOAuthResponse",
+  "fields":[{"name":"Companion"}]
+},
+{
+  "name":"com.hrothwell.anime.domain.mal.MALOAuthResponse$Companion",
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {

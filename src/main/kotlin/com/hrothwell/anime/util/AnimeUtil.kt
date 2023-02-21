@@ -1,15 +1,14 @@
 package com.hrothwell.anime.util
 
 import com.github.kittinunf.fuel.core.Response
-import com.hrothwell.anime.domain.Node
+import com.hrothwell.anime.domain.mal.AnimeNode
 import com.hrothwell.anime.exception.MALResponseException
-import kotlin.system.exitProcess
 
 /**
  * Static util for common functions used in commands
  */
 class AnimeUtil {
-  companion object{
+  companion object {
     var debug = false
     val RED = "\u001b[31m"
     val RESET = "\u001b[0m"
@@ -23,44 +22,48 @@ class AnimeUtil {
 
     fun handlePotentialHttpErrors(response: Response) {
       printDebug("Handling potential http errors for response. URL: ${response.url}")
-      if(response.statusCode != 200){
-        throw MALResponseException("""
+      if (response.statusCode != 200) {
+        throw MALResponseException(
+          """
           Could not call ${response.url}
           ${response.statusCode} error returned from MAL: ${response.body()}
           
           $quickErrorHelp
-        """.trimIndent())
+        """.trimIndent()
+        )
       }
     }
 
-    fun printDebug(msg: String){
-      if(debug){
+    fun printDebug(msg: String) {
+      if (debug) {
         println(msg)
       }
     }
 
-    fun openUrl(url: String){
-      try{
+    fun openUrl(url: String) {
+      try {
         // use cmd if on windows to just open it
-        if(System.getProperty("os.name").lowercase().contains("windows")){
-          Runtime.getRuntime().exec("""
+        if (System.getProperty("os.name").lowercase().contains("windows")) {
+          Runtime.getRuntime().exec(
+            """
         cmd.exe /c start "" "$url"
-      """.trimIndent())
-        }
-        // TODO will need to test if this actually works on mac (developing on Windows)
-        else{
-          Runtime.getRuntime().exec("""
+      """.trimIndent()
+          )
+        } else {
+          Runtime.getRuntime().exec(
+            """
             open "$url"
-          """.trimIndent())
+          """.trimIndent()
+          )
         }
-      } catch(t: Throwable){
+      } catch (t: Throwable) {
         System.err.println("couldn't open url, $t")
       }
     }
 
     // Should maybe move under MALClient? doesn't interact with the same API though
-    fun openAnime(anime: Node?){
-      if(anime == null) return
+    fun openAnime(anime: AnimeNode?) {
+      if (anime == null) return
       openUrl("https://myanimelist.net/anime/${anime.id}")
     }
   }

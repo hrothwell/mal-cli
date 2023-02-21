@@ -6,20 +6,22 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.hrothwell.anime.client.MALClient
-import com.hrothwell.anime.domain.ListStatus
+import com.hrothwell.anime.domain.AnimeListStatus
 import com.hrothwell.anime.util.AnimeUtil
 import com.hrothwell.anime.util.FileUtil
 
-class Random: CliktCommand(
+class Random : CliktCommand(
   help = """
     Select a random anime from your lists
   """.trimIndent()
 ) {
 
-  private val possibleListStatusValues = ListStatus.values().map { it.malValue }.toTypedArray()
-  private val user by option("-u", "--user-name", help = """
+  private val possibleListStatusValues = AnimeListStatus.values().map { it.malValue }.toTypedArray()
+  private val user by option(
+    "-u", "--user-name", help = """
     user name. if not provided this will default to "user_name" value in "${FileUtil.home}/anime-cli/mal-secret.json"
-  """.trimIndent())
+  """.trimIndent()
+  )
 
   private val list by option(
     "-l",
@@ -28,22 +30,27 @@ class Random: CliktCommand(
   ).choice(choices = possibleListStatusValues)
     .default("plan_to_watch")
 
-  private val includeNotYetAired by option("--include-not-yet-aired", help = """
+  private val includeNotYetAired by option(
+    "--include-not-yet-aired", help = """
     include anime that have not yet aired, default to exclude
-  """.trimIndent())
+  """.trimIndent()
+  )
     .flag("--exclude-not-yet-aired", default = false)
 
   override fun run() {
-    try{
+    try {
       val anime = MALClient.getRandomAnime(user, list, includeNotYetAired)
-      val title = if(anime != null) "Random selection: ${anime.title}" else "$user's list was empty"
+      val title = if (anime != null) "Random selection: ${anime.title}" else "$user's list was empty"
       echo(title)
       AnimeUtil.openAnime(anime)
-    } catch(t: Throwable){
-      echoError("""
+    } catch (t: Throwable) {
+      echoError(
+        """
         Unable to retrieve random anime. Message: ${t.message}
         Cause: ${t.cause}
-      """.trimIndent())
+        Stacktrace: ${t.stackTraceToString()}
+      """.trimIndent()
+      )
     }
   }
 

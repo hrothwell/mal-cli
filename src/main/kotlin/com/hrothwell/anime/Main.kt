@@ -6,7 +6,7 @@ import com.hrothwell.anime.commands.*
 object Main {
   @JvmStatic
   fun main(args: Array<String>) {
-    Anime().subcommands(
+    Mal().subcommands(
       Login(),
       Random(),
       Suggest(),

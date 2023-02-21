@@ -41,6 +41,14 @@
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {
+  "name":"com.hrothwell.anime.domain.mal.MangaData",
+  "fields":[{"name":"Companion"}]
+},
+{
+  "name":"com.hrothwell.anime.domain.mal.MangaData$Companion",
+  "methods":[{"name":"serializer","parameterTypes":[] }]
+},
+{
   "name":"com.sun.crypto.provider.AESCipher$General",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },

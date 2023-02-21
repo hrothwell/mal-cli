@@ -10,7 +10,7 @@ import java.io.File
 class FileUtil {
   companion object {
     val home = System.getProperty("user.home")
-    private val secretLocation = "$home/anime-cli/mal-secret.json"
+    private val secretLocation = "$home/mal-cli/mal-secret.json"
     val jsonReader = Json { ignoreUnknownKeys = true }
 
     fun getUserSecrets(): UserSecrets {

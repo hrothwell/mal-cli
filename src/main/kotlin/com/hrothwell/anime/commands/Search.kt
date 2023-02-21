@@ -4,12 +4,12 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import com.hrothwell.anime.client.MalAnimeClient
+import com.hrothwell.anime.client.MalClient
 import com.hrothwell.anime.util.AnimeUtil
 
 class Search : CliktCommand(
   help = """
-    Search MAL for an anime
+    Search MAL for an anime/manga
   """.trimIndent()
 ) {
 
@@ -27,15 +27,24 @@ class Search : CliktCommand(
 
   override fun run() {
     try {
-      val animeList = MalAnimeClient.getAnimeList(keywords, limit.toInt())
-      echo(animeList.map { it.title })
-      if (animeList.size == 1) {
-        AnimeUtil.openAnime(animeList.first())
+      if (AnimeUtil.isAnime) {
+        val animeList = MalClient.getAnimeList(keywords, limit.toInt())
+        echo(animeList.map { it.title })
+        if (animeList.size == 1) {
+          AnimeUtil.openAnime(animeList.first())
+        }
+      } else {
+        val mangaList = MalClient.getMangaList(keywords, limit.toInt())
+        echo(mangaList.map { it.title })
+        if (mangaList.size == 1) {
+          AnimeUtil.openManga(mangaList.first())
+        }
       }
+
     } catch (t: Throwable) {
       echoError(
         """
-        error searching anime. Message: ${t.message}
+        error searching anime / manga. Message: ${t.message}
         
         cause: ${t.cause}
       """.trimIndent()

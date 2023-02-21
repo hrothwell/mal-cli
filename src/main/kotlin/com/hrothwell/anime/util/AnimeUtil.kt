@@ -2,6 +2,7 @@ package com.hrothwell.anime.util
 
 import com.github.kittinunf.fuel.core.Response
 import com.hrothwell.anime.domain.mal.AnimeNode
+import com.hrothwell.anime.domain.mal.MangaNode
 import com.hrothwell.anime.exception.MALResponseException
 
 /**
@@ -11,6 +12,7 @@ class AnimeUtil {
   companion object {
     var debug = false
     var shouldOpenUrls = true
+    var isAnime = true // true, search anime, false search manga. Think of an enum name or something
     val RED = "\u001b[31m"
     val RESET = "\u001b[0m"
 
@@ -68,6 +70,11 @@ class AnimeUtil {
     fun openAnime(anime: AnimeNode?) {
       if (anime == null) return
       openUrl("https://myanimelist.net/anime/${anime.id}")
+    }
+
+    fun openManga(manga: MangaNode?) {
+      if (manga == null) return
+      openUrl("https://myanimelist.net/manga/${manga.id}")
     }
   }
 }

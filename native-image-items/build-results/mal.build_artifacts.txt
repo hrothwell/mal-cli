@@ -1,0 +1,6 @@
+[EXECUTABLE]
+mal.exe
+
+[JDK_LIB]
+sunmscapi.dll
+

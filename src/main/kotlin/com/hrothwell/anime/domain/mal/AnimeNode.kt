@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class AnimeNode(
   val id: Long,
   val title: String,
-  val status: AiringStatus? = null,
+  val status: AnimeAiringStatus? = null,
   val mean: Float? = null,
   val rank: Int? = null,
   val popularity: Int? = null,

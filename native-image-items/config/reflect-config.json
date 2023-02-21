@@ -17,19 +17,27 @@
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MALAnimeListResponse",
+  "name":"com.hrothwell.anime.domain.mal.AnimeData",
   "fields":[{"name":"Companion"}]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MALAnimeListResponse$Companion",
+  "name":"com.hrothwell.anime.domain.mal.AnimeData$Companion",
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MALOAuthResponse",
+  "name":"com.hrothwell.anime.domain.mal.MalGenericListResponse",
   "fields":[{"name":"Companion"}]
 },
 {
-  "name":"com.hrothwell.anime.domain.mal.MALOAuthResponse$Companion",
+  "name":"com.hrothwell.anime.domain.mal.MalGenericListResponse$Companion",
+  "methods":[{"name":"serializer","parameterTypes":["kotlinx.serialization.KSerializer"] }]
+},
+{
+  "name":"com.hrothwell.anime.domain.mal.MalOAuthResponse",
+  "fields":[{"name":"Companion"}]
+},
+{
+  "name":"com.hrothwell.anime.domain.mal.MalOAuthResponse$Companion",
   "methods":[{"name":"serializer","parameterTypes":[] }]
 },
 {

@@ -3,7 +3,7 @@ package com.hrothwell.anime.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
-import com.hrothwell.anime.client.MALClient
+import com.hrothwell.anime.client.MalAnimeClient
 import com.hrothwell.anime.util.AnimeUtil
 
 class Suggest : CliktCommand(
@@ -19,7 +19,7 @@ class Suggest : CliktCommand(
 
   override fun run() {
     try {
-      val animeList = MALClient.getSuggestedAnime(limit.toInt())
+      val animeList = MalAnimeClient.getSuggestedAnime(limit.toInt())
       echo("Try: ${animeList.map { it.title }}")
       if (animeList.size == 1) {
         AnimeUtil.openAnime(animeList.first())

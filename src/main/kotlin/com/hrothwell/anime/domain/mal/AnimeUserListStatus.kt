@@ -1,6 +1,5 @@
 package com.hrothwell.anime.domain.mal
 
-import com.hrothwell.anime.domain.AnimeListStatus
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

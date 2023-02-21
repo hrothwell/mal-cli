@@ -1,6 +1,6 @@
 package com.hrothwell.anime.domain
 
-import com.hrothwell.anime.domain.mal.MALOAuthResponse
+import com.hrothwell.anime.domain.mal.MalOAuthResponse
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -13,5 +13,5 @@ data class UserSecrets(
   @SerialName("oauth_authorization_code")
   val oauthAuthorizationCode: String? = null,
   @SerialName("oauth_tokens")
-  val oauthTokens: MALOAuthResponse? = null
+  val oauthTokens: MalOAuthResponse? = null
 )

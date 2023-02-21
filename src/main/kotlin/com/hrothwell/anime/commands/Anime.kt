@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.hrothwell.anime.util.AnimeUtil
 
+// TODO rebrand/rename to just be "mal" or something, as "anime manga <manga commands>" would look kind of odd
 class Anime : CliktCommand(
   help = "CLI for interacting with MAL",
   epilog = """

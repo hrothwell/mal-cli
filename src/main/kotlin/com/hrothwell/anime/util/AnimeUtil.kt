@@ -10,6 +10,7 @@ import com.hrothwell.anime.exception.MALResponseException
 class AnimeUtil {
   companion object {
     var debug = false
+    var shouldOpenUrls = true
     val RED = "\u001b[31m"
     val RESET = "\u001b[0m"
 
@@ -41,23 +42,25 @@ class AnimeUtil {
     }
 
     fun openUrl(url: String) {
-      try {
-        // use cmd if on windows to just open it
-        if (System.getProperty("os.name").lowercase().contains("windows")) {
-          Runtime.getRuntime().exec(
-            """
+      if (shouldOpenUrls) {
+        try {
+          // use cmd if on windows to just open it
+          if (System.getProperty("os.name").lowercase().contains("windows")) {
+            Runtime.getRuntime().exec(
+              """
         cmd.exe /c start "" "$url"
       """.trimIndent()
-          )
-        } else {
-          Runtime.getRuntime().exec(
-            """
+            )
+          } else {
+            Runtime.getRuntime().exec(
+              """
             open "$url"
           """.trimIndent()
-          )
+            )
+          }
+        } catch (t: Throwable) {
+          System.err.println("couldn't open url, $t")
         }
-      } catch (t: Throwable) {
-        System.err.println("couldn't open url, $t")
       }
     }
 

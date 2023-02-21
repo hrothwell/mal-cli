@@ -17,8 +17,15 @@ class Anime : CliktCommand(
   """.trimIndent()
   ).flag("--no-debug", default = false)
 
+  val loud by option(
+    "--loud", help = """
+      attempt to open any anime pages, open login url, etc. default true / loud
+    """.trimIndent()
+  ).flag("--quiet", default = true)
+
   override fun run() {
     AnimeUtil.debug = debug
+    AnimeUtil.shouldOpenUrls = loud
     if (AnimeUtil.debug) {
       echo("debug is on")
     }

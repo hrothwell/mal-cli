@@ -12,6 +12,7 @@ echo running agentlib
 @REM login process will be kind of annoying/tedious to hit
 @REM TODO add more scenarios or think of a better way to go through program flow. Error scenarios might be hit or miss
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar -h
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar login
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar refresh
 call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar suggest

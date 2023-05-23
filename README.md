@@ -30,13 +30,13 @@ Commands:
   search   Search MAL for an anime/manga
 
 extended user guide, source code, report issues, etc -
-https://github.com/hrothwell/anime-cli
+https://github.com/hrothwell/mal-cli
 
 ```
 
 ## Latest Windows native exe
 
-- Latest windows exe build can be found [here](./native-image-items/build-results/anime.exe)
+- Latest windows exe build can be found [here](./native-image-items/build-results/mal.exe)
 - I am trying to only ever merge completely functional/working native-image code, but no promises this will always work.
   More automated testing to come, maybe...
 - Ideally get versioning setup as well

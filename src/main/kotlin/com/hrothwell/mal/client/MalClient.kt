@@ -68,7 +68,7 @@ class MalClient {
       val result = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<MangaData>>(json)
       MalUtil.printDebug("MALAnimeListResponse: ${result.data.first()}")
 
-      return result.data.filter { it.node.status != MangaPublishingStatus.NOT_YET_PUBLISHED || includeNotYetPublished }
+      return result.data.filter { it.node.status != MangaPublishingStatus.NOT_YET_PUBLISHED.name || includeNotYetPublished }
         .randomOrNull()?.node
     }
 

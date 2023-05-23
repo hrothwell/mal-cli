@@ -21,12 +21,11 @@ class Random : CliktCommand(
     AnimeListStatus.values().map { it.malValue }
   private val possibleMangaListStatuses = MangaListStatus.values().map { it.malValue }
 
-
   private val allPossibleValues = (possibleAnimeListStatusValues + possibleMangaListStatuses).distinct().toTypedArray()
 
   private val user by option(
     "-u", "--user-name", help = """
-    user name. if not provided this will default to "user_name" value in "${FileUtil.home}/anime-cli/mal-secret.json"
+    user name. if not provided this will default to "user_name" value in "${FileUtil.home}/mal-cli/mal-secret.json"
   """.trimIndent()
   )
 

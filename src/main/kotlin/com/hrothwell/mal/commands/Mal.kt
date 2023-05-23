@@ -8,7 +8,7 @@ import com.hrothwell.mal.util.MalUtil
 class Mal : CliktCommand(
   help = "CLI for interacting with MAL",
   epilog = """
-    extended user guide, source code, report issues, etc - https://github.com/hrothwell/anime-cli
+    extended user guide, source code, report issues, etc - https://github.com/hrothwell/mal-cli
   """.trimIndent()
 ) {
 

@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class AnimeUserListStatus(
-  val status: AnimeListStatus,
+  val status: String,
   val score: Int,
   @SerialName("num_episodes_watched")
   val numEpisodesWatched: Int,

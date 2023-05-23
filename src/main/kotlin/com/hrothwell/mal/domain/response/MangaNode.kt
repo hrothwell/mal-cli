@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class MangaNode(
   val id: Long,
   val title: String,
-  val status: MangaPublishingStatus? = null,
+  val status: String? = null,
   val mean: Float? = null,
   val rank: Int? = null,
   val popularity: Int? = null,

@@ -44,7 +44,7 @@ class MalClient {
       val result = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<AnimeData>>(json)
       MalUtil.printDebug("MALAnimeListResponse: ${result.data.first()}")
 
-      return result.data.filter { it.node.status != AnimeAiringStatus.NOT_YET_AIRED || includeNotYetAired }
+      return result.data.filter { !it.node.status.equals(AnimeAiringStatus.NOT_YET_AIRED.name, true) || includeNotYetAired }
         .randomOrNull()?.node
     }
 
@@ -68,7 +68,7 @@ class MalClient {
       val result = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<MangaData>>(json)
       MalUtil.printDebug("MALAnimeListResponse: ${result.data.first()}")
 
-      return result.data.filter { it.node.status != MangaPublishingStatus.NOT_YET_PUBLISHED.name || includeNotYetPublished }
+      return result.data.filter { !it.node.status.equals(MangaPublishingStatus.NOT_YET_PUBLISHED.name, true) || includeNotYetPublished }
         .randomOrNull()?.node
     }
 

@@ -1,5 +1,13 @@
 {
   "resources":{
-  "includes":[]},
+  "includes":[{
+    "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt67b/nfkc.nrm\\E"
+  }, {
+    "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt67b/uprops.icu\\E"
+  }, {
+    "pattern":"java.base:\\Qsun/net/idn/uidna.spp\\E"
+  }, {
+    "pattern":"java.base:\\Qsun/text/resources/CharacterBreakIteratorData\\E"
+  }]},
   "bundles":[]
 }

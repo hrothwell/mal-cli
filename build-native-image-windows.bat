@@ -1,4 +1,4 @@
-echo off
+@echo off
 set root=%~dp0
 call %root%gradlew.bat clean build
 echo making config directory

@@ -1,5 +1,6 @@
 @echo off
 set root=%~dp0
+set version=1.0
 call %root%gradlew.bat clean build
 echo making config directory
 mkdir %root%build\libs\META-INF\native-image
@@ -11,24 +12,24 @@ echo running agentlib
 @REM no args for base command, then add all subcommands also. potentially will need to run with any arguments also?
 @REM login process will be kind of annoying/tedious to hit
 @REM TODO add more scenarios or think of a better way to go through program flow. Error scenarios might be hit or miss
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar -h
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar login
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar refresh
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar suggest
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar suggest -l 101
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar random
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar -m random
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar --quiet random
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar --quiet -m random
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar random --include-not-yet-released
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar -m random --include-not-yet-released
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar random -u hone_the_rat -l completed
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar -m random -u hone_the_rat -l completed
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar random -u unknown_user_113355_idk_error -l completed
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar -m random -u unknown_user_113355_idk_error -l completed
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar search -q "Tokyo Ghoul" -l 2
-call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar -m search -q "Tokyo Ghoul" -l 2
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar -h
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar login
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar refresh
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar suggest
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar suggest -l 101
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar random
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar -m random
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar --quiet random
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar --quiet -m random
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar random --include-not-yet-released
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar -m random --include-not-yet-released
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar random -u hone_the_rat -l completed
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar -m random -u hone_the_rat -l completed
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar random -u unknown_user_113355_idk_error -l completed
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar -m random -u unknown_user_113355_idk_error -l completed
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar search -q "Tokyo Ghoul" -l 2
+call java -agentlib:native-image-agent=config-merge-dir=%configPath% -jar %root%build\libs\mal-cli-%version%.jar -m search -q "Tokyo Ghoul" -l 2
 echo config files located here "%configPath%"
 set exeBuildResultPath=%root%native-image-items\build-results
 mkdir %exeBuildResultPath%

@@ -210,7 +210,7 @@ class MalClient {
         if (response.status.isSuccess()) {
           response.getBody<MalOAuthResponse>()
         } else {
-          // TODO 
+          // TODO
           println("ERROR: $response")
           throw Exception()
         }

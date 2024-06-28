@@ -2,8 +2,12 @@ version: "3"
 
 services:
   mal-cli:
+    build: .
     container_name: mal-cli
     image: hrothwell/mal-cli:latest
     # Update path on the left to local path containing mal-secret.json
     volumes:
       - ${PATH_TO_MAL_CLI}:/root/mal-cli
+    # this doesn't actually work and still needs -p 8080:8080 when running `docker compose run...`
+    ports:
+      - "8080:8080"

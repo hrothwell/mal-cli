@@ -1,14 +1,29 @@
 package com.hrothwell.mal.client
 
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.result.Result
-import com.hrothwell.mal.domain.response.*
-import com.hrothwell.mal.exception.OAuthCallException
+import com.hrothwell.mal.domain.response.AnimeAiringStatus
+import com.hrothwell.mal.domain.response.AnimeData
+import com.hrothwell.mal.domain.response.AnimeNode
+import com.hrothwell.mal.domain.response.MalGenericListResponse
+import com.hrothwell.mal.domain.response.MalOAuthResponse
+import com.hrothwell.mal.domain.response.MangaData
+import com.hrothwell.mal.domain.response.MangaNode
+import com.hrothwell.mal.domain.response.MangaPublishingStatus
 import com.hrothwell.mal.util.FileUtil
 import com.hrothwell.mal.util.MalUtil
-import kotlinx.serialization.decodeFromString
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpMessageBuilder
+import io.ktor.http.isSuccess
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.runBlocking
 import kotlin.math.absoluteValue
 
 /**
@@ -18,6 +33,17 @@ import kotlin.math.absoluteValue
  */
 class MalClient {
   companion object {
+    val ktor = HttpClient(CIO) {
+      defaultRequest {
+        url("https://api.myanimelist.net/v2/")
+        // client id should never change
+        header("X-MAL-CLIENT-ID", FileUtil.getUserSecrets().clientId)
+      }
+
+      install(ContentNegotiation) {
+        json(FileUtil.jsonReader)
+      }
+    }
 
     private val allAnimeFields =
       "fields" to "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status"
@@ -28,48 +54,51 @@ class MalClient {
       MalUtil.printDebug("getRandomAnime - enter")
       val clientSecrets = FileUtil.getUserSecrets()
 
-      val listStatus = "status" to list
-      val limit = "limit" to 1000
       val userPathParam = user ?: clientSecrets.userName
 
-      val request =
-        Fuel.get(
-          path = "https://api.myanimelist.net/v2/users/$userPathParam/animelist",
-          parameters = listOf(listStatus, limit, allAnimeFields)
-        )
+      val response = runBlocking {
+        ktor.get("users/$userPathParam/animelist") {
+          parameter("status", list)
+          parameter("limit", 1000)
+          parameter("fields", "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status")
+        }
+      }
 
-      val json = callWithClientId(request).get()
+      val result = runBlocking {
+        response.getBody<MalGenericListResponse<AnimeData>>()
+      } ?: MalGenericListResponse(emptyList())
 
-      MalUtil.printDebug("getRandomAnime - decoding MAL response")
-      val result = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<AnimeData>>(json)
-      MalUtil.printDebug("MALAnimeListResponse: ${result.data.first()}")
-
-      return result.data.filter { !it.node.status.equals(AnimeAiringStatus.NOT_YET_AIRED.name, true) || includeNotYetAired }
-        .randomOrNull()?.node
+      return result.data.filter {
+        !it.node.status.equals(
+          AnimeAiringStatus.NOT_YET_AIRED.name,
+          true
+        ) || includeNotYetAired
+      }.randomOrNull()?.node
     }
 
     fun getRandomManga(user: String?, list: String, includeNotYetPublished: Boolean): MangaNode? {
       MalUtil.printDebug("getRandomManga - enter")
       val clientSecrets = FileUtil.getUserSecrets()
-
-      val listStatus = "status" to list
-      val limit = "limit" to 1000
       val userPathParam = user ?: clientSecrets.userName
 
-      val request =
-        Fuel.get(
-          path = "https://api.myanimelist.net/v2/users/$userPathParam/mangalist",
-          parameters = listOf(listStatus, limit, allMangaFields)
-        )
+      val response = runBlocking {
+        ktor.get("users/$userPathParam/mangalist") {
+          parameter("status", list)
+          parameter("limit", 1000)
+          parameter("fields", "status,mean,rank,popularity,num_volumes,num_chapters,list_status")
+        }
+      }
 
-      val json = callWithClientId(request).get()
+      val result = runBlocking {
+        response.getBody<MalGenericListResponse<MangaData>>()
+      } ?: MalGenericListResponse(emptyList())
 
-      MalUtil.printDebug("getRandomAnime - decoding MAL response")
-      val result = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<MangaData>>(json)
-      MalUtil.printDebug("MALAnimeListResponse: ${result.data.first()}")
-
-      return result.data.filter { !it.node.status.equals(MangaPublishingStatus.NOT_YET_PUBLISHED.name, true) || includeNotYetPublished }
-        .randomOrNull()?.node
+      return result.data.filter {
+        !it.node.status.equals(
+          MangaPublishingStatus.NOT_YET_PUBLISHED.name,
+          true
+        ) || includeNotYetPublished
+      }.randomOrNull()?.node
     }
 
     /**
@@ -77,14 +106,17 @@ class MalClient {
      */
     fun getAnimeList(query: String, limit: Int): List<AnimeNode> {
       MalUtil.printDebug("getAnimeList - enter")
-      val q = "q" to query
-      val limitParam = "limit" to limit.absoluteValue
-      val params = listOf(q, limitParam, allAnimeFields)
-      val url = "https://api.myanimelist.net/v2/anime"
+      val response = runBlocking {
+        ktor.get("https://api.myanimelist.net/v2/anime") {
+          parameter("q", query)
+          parameter("limit", limit.absoluteValue)
+          parameter("fields", "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status")
+        }
+      }
 
-      val request = Fuel.get(url, parameters = params)
-      val json = callWithClientId(request).get()
-      val result = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<AnimeData>>(json)
+      val result = runBlocking {
+        response.getBody<MalGenericListResponse<AnimeData>>()
+      } ?: MalGenericListResponse(emptyList())
 
       MalUtil.printDebug("getAnimeList - exit")
       return result.data.map { it.node }
@@ -95,14 +127,18 @@ class MalClient {
      */
     fun getMangaList(query: String, limit: Int): List<MangaNode> {
       MalUtil.printDebug("getMangaList - enter")
-      val q = "q" to query
-      val limitParam = "limit" to limit.absoluteValue
-      val params = listOf(q, limitParam, allMangaFields)
-      val url = "https://api.myanimelist.net/v2/manga"
+      val response = runBlocking {
+        ktor.get("https://api.myanimelist.net/v2/manga") {
+          parameter("q", query)
+          parameter("limit", limit.absoluteValue)
+          parameter("fields", "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status")
+        }
+      }
 
-      val request = Fuel.get(url, parameters = params)
-      val json = callWithClientId(request).get()
-      val result = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<MangaData>>(json)
+      val result = runBlocking {
+        response.getBody<MalGenericListResponse<MangaData>>()
+      } ?: MalGenericListResponse(emptyList())
+
 
       MalUtil.printDebug("getMangaList - exit")
       return result.data.map { it.node }
@@ -114,56 +150,36 @@ class MalClient {
     fun getSuggestedAnime(limit: Int): List<AnimeNode> {
       MalUtil.printDebug("getSuggestedAnime - enter")
       val limitToUse = if (limit.absoluteValue > 100) 100 else limit.absoluteValue
-      val url = "https://api.myanimelist.net/v2/anime/suggestions?limit=$limitToUse"
 
       MalUtil.printDebug("getSuggestedAnime - calling callWithOauth")
-      val request = Fuel.get(url)
-      val jsonResult = callWithOauth(request).get()
 
-      MalUtil.printDebug("getSuggestedAnime - decoding MAL response")
-      val malAnimeListResponse = FileUtil.jsonReader.decodeFromString<MalGenericListResponse<AnimeData>>(jsonResult)
-      return malAnimeListResponse.data.map {
+      // TODO this needs the oauth token on it
+      val response = runBlocking {
+        ktor.get("https://api.myanimelist.net/v2/anime/suggestions") {
+          parameter("limit", limitToUse)
+          oauthHeader()
+        }
+      }
+
+      val result = runBlocking {
+        response.getBody<MalGenericListResponse<AnimeData>>()
+      } ?: MalGenericListResponse(emptyList())
+
+      return result.data.map {
         it.node
       }
     }
 
-    private fun callWithClientId(request: Request): Result<String, FuelError> {
-      MalUtil.printDebug("callWithClientId - enter")
-      val clientSecrets = FileUtil.getUserSecrets()
-      val header = "X-MAL-CLIENT-ID" to clientSecrets.clientId
-      MalUtil.printDebug("callWithClientId - get response")
-      val response = request.appendHeader(header).responseString()
-      MalUtil.handlePotentialHttpErrors(response.second)
-      return response.third
+    private fun HttpMessageBuilder.oauthHeader(token: String? = null) {
+      header("Authorization", "Bearer ${token ?: FileUtil.getUserSecrets().oauthTokens?.accessToken}")
     }
 
-    private fun callWithOauth(originalRequest: Request): Result<String, FuelError> {
-      try {
-        MalUtil.printDebug("callWithOauth - enter")
-
-        val userSecrets = FileUtil.getUserSecrets()
-        val updatedRequest =
-          originalRequest.appendHeader("Authorization" to "Bearer ${userSecrets.oauthTokens?.accessToken}")
-
-        MalUtil.printDebug("callWithOauth - attempt call")
-        val (request, response, result) = updatedRequest.responseString()
-        return when (result) {
-          is Result.Failure -> {
-            println("token invalid, refreshing and trying again")
-            val newToken = refreshOAuthToken()
-            request.header("Authorization" to "Bearer $newToken").responseString().third
-          }
-          else -> {
-            MalUtil.printDebug("callWithOauth - token valid, return response")
-            result
-          }
-        }
-      } catch (t: Throwable) {
-        throw OAuthCallException(
-          """
-          Failed while making using oauth token
-        """.trimIndent(), t
-        )
+    private suspend inline fun <reified T> HttpResponse.getBody(): T? {
+      return if (this.status.isSuccess()) {
+        return this.body<T>()
+      } else {
+        // TODO error handling / logging
+        null
       }
     }
 
@@ -171,19 +187,22 @@ class MalClient {
       MalUtil.printDebug("refreshOAuthToken - enter")
 
       val userSecrets = FileUtil.getUserSecrets()
-      val grantType = "grant_type" to "refresh_token"
-      val refreshToken = "refresh_token" to userSecrets.oauthTokens?.refreshToken
-      val clientId = "client_id" to userSecrets.clientId
-      val params = listOf(grantType, refreshToken, clientId)
-
       MalUtil.printDebug("refreshOAuthToken - posting for response")
-      val refreshResponse = Fuel.post("https://myanimelist.net/v1/oauth2/token", params).response()
-      MalUtil.handlePotentialHttpErrors(refreshResponse.second)
+
+      val response = runBlocking {
+        ktor.post("https://api.myanimelist.net/v1/oauth2/token") {
+          parameter("grant_type", "refresh_token")
+          parameter("refresh_token", userSecrets.oauthTokens?.refreshToken)
+          parameter("client_id", userSecrets.clientId)
+        }
+      }
+
+      val result = runBlocking {
+        response.getBody<MalOAuthResponse>() ?: throw Exception("TODO")
+      }
 
       MalUtil.printDebug("refreshOAuthToken - decode response and updating secrets")
-      val newOAuthJson = String(refreshResponse.third.get())
-      val malOAuthResponse = FileUtil.jsonReader.decodeFromString<MalOAuthResponse>(newOAuthJson)
-      val updatedSecrets = userSecrets.copy(oauthTokens = malOAuthResponse)
+      val updatedSecrets = userSecrets.copy(oauthTokens = result)
       FileUtil.updateUserSecrets(updatedSecrets)
       return updatedSecrets.oauthTokens?.accessToken
     }

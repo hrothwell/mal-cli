@@ -15,12 +15,15 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpMessageBuilder
+import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
@@ -190,15 +193,27 @@ class MalClient {
       MalUtil.printDebug("refreshOAuthToken - posting for response")
 
       val response = runBlocking {
-        ktor.post("https://api.myanimelist.net/v1/oauth2/token") {
-          parameter("grant_type", "refresh_token")
-          parameter("refresh_token", userSecrets.oauthTokens?.refreshToken)
-          parameter("client_id", userSecrets.clientId)
+        ktor.post("https://myanimelist.net/v1/oauth2/token") {
+          setBody(
+            FormDataContent(
+              Parameters.build {
+                append("grant_type", "refresh_token")
+                append("refresh_token", userSecrets.oauthTokens?.refreshToken!!)
+                append("client_id", userSecrets.clientId)
+              }
+            )
+          )
         }
       }
 
       val result = runBlocking {
-        response.getBody<MalOAuthResponse>() ?: throw Exception("TODO")
+        if (response.status.isSuccess()) {
+          response.getBody<MalOAuthResponse>()
+        } else {
+          // TODO 
+          println("ERROR: $response")
+          throw Exception()
+        }
       }
 
       MalUtil.printDebug("refreshOAuthToken - decode response and updating secrets")

@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  mal-cli:
+    container_name: mal-cli
+    image: hrothwell/mal-cli:latest
+    # Update path on the left to local path containing mal-secret.json
+    volumes:
+      - ${PATH_TO_MAL_CLI}:/root/mal-cli

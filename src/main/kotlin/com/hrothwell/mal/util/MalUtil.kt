@@ -4,6 +4,8 @@ import com.github.kittinunf.fuel.core.Response
 import com.hrothwell.mal.domain.response.AnimeNode
 import com.hrothwell.mal.domain.response.MangaNode
 import com.hrothwell.mal.exception.MALResponseException
+import java.awt.Desktop
+import java.net.URI
 
 /**
  * Static util for common functions used in commands
@@ -46,19 +48,10 @@ class MalUtil {
     fun openUrl(url: String) {
       if (shouldOpenUrls) {
         try {
-          // use cmd if on windows to just open it
-          if (System.getProperty("os.name").lowercase().contains("windows")) {
-            Runtime.getRuntime().exec(
-              """
-        cmd.exe /c start "" "$url"
-      """.trimIndent()
-            )
+          if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            Desktop.getDesktop().browse(URI(url));
           } else {
-            Runtime.getRuntime().exec(
-              """
-            open "$url"
-          """.trimIndent()
-            )
+            println(url)
           }
         } catch (t: Throwable) {
           System.err.println("couldn't open url, $t")

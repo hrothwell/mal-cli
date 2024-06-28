@@ -124,6 +124,7 @@ class Login : CliktCommand(
     val updatedSecrets = secrets.copy(oauthTokens = result)
 
     FileUtil.updateUserSecrets(updatedSecrets)
+    echo("You are now logged in!")
   }
 
   private fun echoError(msg: String) {

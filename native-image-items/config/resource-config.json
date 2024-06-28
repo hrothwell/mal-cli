@@ -7,8 +7,5 @@
   }, {
     "pattern":"java.base:\\Qsun/text/resources/CharacterBreakIteratorData\\E"
   }]},
-  "bundles":[{
-    "name":"sun.awt.resources.awt",
-    "classNames":["sun.awt.resources.awt"]
-  }]
+  "bundles":[]
 }

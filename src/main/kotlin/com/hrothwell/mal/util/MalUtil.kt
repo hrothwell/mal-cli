@@ -32,12 +32,11 @@ class MalUtil {
     fun openUrl(url: String) {
       if (shouldOpenUrls) {
         try {
+          if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            Desktop.getDesktop().browse(URI(url))
+          } else {
             println(url)
-//          if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-//            Desktop.getDesktop().browse(URI(url))
-//          } else {
-//            println(url)
-//          }
+          }
         } catch (t: Throwable) {
           System.err.println("couldn't open url, $t")
         }

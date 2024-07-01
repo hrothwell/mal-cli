@@ -1,62 +1,68 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version "${kotlinVersion}"
-    id 'org.jetbrains.kotlin.plugin.serialization' version "${kotlinVersion}"
-    id "com.github.johnrengelman.shadow" version "7.1.2"
-    id 'application'
+  id 'org.jetbrains.kotlin.jvm' version "${kotlinVersion}"
+  id 'org.jetbrains.kotlin.plugin.serialization' version "${kotlinVersion}"
+  id "com.github.johnrengelman.shadow" version "7.1.2"
+  id 'application'
 }
 
 group = 'com.hrothwell'
 version = '1.0'
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 mainClassName = "com.hrothwell.mal.Main"
 
 application {
-    mainClass.set("com.hrothwell.mal.Main")
+  mainClass.set("com.hrothwell.mal.Main")
 }
 
 run {
-    standardInput = System.in
+  standardInput = System.in
 }
 
 jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    manifest {
-        attributes(
-                'Main-Class': 'com.hrothwell.mal.Main'
-        )
-    }
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
-    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  manifest {
+    attributes(
+      'Main-Class': 'com.hrothwell.mal.Main'
+    )
+  }
+  exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-    implementation("com.github.ajalt.clikt:clikt:3.5.0")
-    implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+  implementation("com.github.ajalt.clikt:clikt:3.5.0")
+
+  implementation "io.ktor:ktor-client-core:$ktorVersion"
+  implementation "io.ktor:ktor-client-cio:$ktorVersion"
+  implementation "io.ktor:ktor-client-content-negotiation:$ktorVersion"
+  implementation "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion"
+  implementation("org.slf4j:slf4j-nop:2.0.13")
+
+  implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+  testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
 test {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 tasks {
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = "11"
-        }
+  compileKotlin {
+    kotlinOptions {
+      jvmTarget = "11"
     }
-    compileTestKotlin {
-        kotlinOptions {
-            jvmTarget = "11"
-        }
+  }
+  compileTestKotlin {
+    kotlinOptions {
+      jvmTarget = "11"
     }
-    build {
-        finalizedBy(installDist)
-    }
+  }
+  build {
+    finalizedBy(installDist)
+  }
 }

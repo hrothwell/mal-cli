@@ -1,7 +1,7 @@
 package com.hrothwell.mal.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.kittinunf.fuel.Fuel
+import com.hrothwell.mal.client.MalClient
 import com.hrothwell.mal.domain.response.MalOAuthResponse
 import com.hrothwell.mal.exception.LoginException
 import com.hrothwell.mal.util.FileUtil
@@ -10,8 +10,16 @@ import com.hrothwell.mal.util.MalUtil.Companion.openUrl
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
-import kotlinx.serialization.decodeFromString
+import io.ktor.client.call.body
+import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.Parameters
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.runBlocking
 import java.net.InetSocketAddress
+import kotlin.collections.set
 import kotlin.random.Random
 import kotlin.system.exitProcess
 
@@ -21,7 +29,10 @@ class Login : CliktCommand(
   """.trimIndent()
 ) {
 
-  private val redirectUrl = "http://localhost:8080/mal"
+  private val PORT = 8080
+
+  // this differs from the port, this is what is listed in the MAL api config
+  private val redirectUrl = "http://localhost:$PORT/mal"
   override fun run() {
     try {
       login()
@@ -47,7 +58,7 @@ class Login : CliktCommand(
     MalUtil.printDebug("login - starting local server")
     val localServer = HttpServer.create()
     localServer.createContext("/mal", MALOAuthHttpHandler())
-    localServer.bind(InetSocketAddress(8080), 0)
+    localServer.bind(InetSocketAddress(PORT), 0)
     localServer.start()
 
     MalUtil.printDebug("login - building user auth url")
@@ -60,7 +71,6 @@ class Login : CliktCommand(
 
     val userAuthUrl =
       "https://myanimelist.net/v1/oauth2/authorize?$grantType&$responseType&$clientId&$redirectUri&$codeChallenge"
-    echo("If it does not open automatically, use this URL to authenticate with MAL: $userAuthUrl")
 
     openUrl(userAuthUrl)
 
@@ -82,26 +92,39 @@ class Login : CliktCommand(
     MalUtil.printDebug("exchangeAuthCode - enter")
     val secrets = FileUtil.getUserSecrets()
 
-    MalUtil.printDebug("exchangeAuthCode - building request")
-    val redirect = "redirect_uri" to redirectUrl
-    val clientId = "client_id" to secrets.clientId
-    val grantType = "grant_type" to "authorization_code"
-    val code = "code" to secrets.oauthAuthorizationCode
-    val codeVerifier = "code_verifier" to pkceCodeVerifier
-    val params = listOf(clientId, grantType, codeVerifier, code, redirect)
-
-    val request = Fuel.post("https://myanimelist.net/v1/oauth2/token", params)
-
     MalUtil.printDebug("exchangeAuthCode - get response")
-    val tokenResult = request.response()
-    MalUtil.handlePotentialHttpErrors(tokenResult.second)
+
+    val response = runBlocking {
+      MalClient.ktor.post("https://myanimelist.net/v1/oauth2/token") {
+        setBody(
+          FormDataContent(
+            Parameters.build {
+              append("client_id", secrets.clientId)
+              append("grant_type", "authorization_code")
+              append("code", secrets.oauthAuthorizationCode!!)
+              append("redirect_uri", redirectUrl)
+              append("code_verifier", pkceCodeVerifier)
+            }
+          )
+        )
+      }
+    }
 
     MalUtil.printDebug("exchangeAuthCode - deconde response")
-    val tokenJson = String(tokenResult.third.get())
-    val tokenResponse = FileUtil.jsonReader.decodeFromString<MalOAuthResponse>(tokenJson)
-    val updatedSecrets = secrets.copy(oauthTokens = tokenResponse)
+    val result = runBlocking {
+      if (response.status.isSuccess()) {
+        response.body<MalOAuthResponse>()
+      } else {
+        echoError("Could not read response")
+        echoError(response.bodyAsText())
+
+        throw Exception()
+      }
+    }
+    val updatedSecrets = secrets.copy(oauthTokens = result)
 
     FileUtil.updateUserSecrets(updatedSecrets)
+    echo("You are now logged in!")
   }
 
   private fun echoError(msg: String) {
@@ -122,11 +145,13 @@ class Login : CliktCommand(
         exchange.sendResponseHeaders(200, 0)
         val outStream = exchange.responseBody
         outStream?.write("return to CLI".toByteArray())
-
         MalUtil.printDebug("MALOAuthHttpHandler.handle - exit")
-        exchange.close()
       } catch (t: Throwable) {
+        exchange?.sendResponseHeaders(404, 0)
+        exchange?.responseBody?.write("something didn't work right".toByteArray())
         throw LoginException("Error handling http request response from MAL during login process", t)
+      } finally {
+        exchange?.close()
       }
     }
 

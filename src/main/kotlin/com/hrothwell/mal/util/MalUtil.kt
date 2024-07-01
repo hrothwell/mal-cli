@@ -1,9 +1,9 @@
 package com.hrothwell.mal.util
 
-import com.github.kittinunf.fuel.core.Response
 import com.hrothwell.mal.domain.response.AnimeNode
 import com.hrothwell.mal.domain.response.MangaNode
-import com.hrothwell.mal.exception.MALResponseException
+import java.awt.Desktop
+import java.net.URI
 
 /**
  * Static util for common functions used in commands
@@ -23,20 +23,6 @@ class MalUtil {
         - 404: user was not found. Was the user a real user? If no user passed in, is your mal-secret.json setup correctly?
     """.trimIndent()
 
-    fun handlePotentialHttpErrors(response: Response) {
-      printDebug("Handling potential http errors for response. URL: ${response.url}")
-      if (response.statusCode != 200) {
-        throw MALResponseException(
-          """
-          Could not call ${response.url}
-          ${response.statusCode} error returned from MAL: ${response.body()}
-          
-          $quickErrorHelp
-        """.trimIndent()
-        )
-      }
-    }
-
     fun printDebug(msg: String) {
       if (debug) {
         println(msg)
@@ -46,19 +32,10 @@ class MalUtil {
     fun openUrl(url: String) {
       if (shouldOpenUrls) {
         try {
-          // use cmd if on windows to just open it
-          if (System.getProperty("os.name").lowercase().contains("windows")) {
-            Runtime.getRuntime().exec(
-              """
-        cmd.exe /c start "" "$url"
-      """.trimIndent()
-            )
+          if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            Desktop.getDesktop().browse(URI(url))
           } else {
-            Runtime.getRuntime().exec(
-              """
-            open "$url"
-          """.trimIndent()
-            )
+            println(url)
           }
         } catch (t: Throwable) {
           System.err.println("couldn't open url, $t")

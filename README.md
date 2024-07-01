@@ -36,7 +36,7 @@ https://github.com/hrothwell/mal-cli
 
 ## Latest Windows native exe
 
-- Latest windows exe build can be found [here](./native-image-items/build-results/mal.exe)
+- Latest windows exe build can be found [here](./native-image-items/build-results)
 - I am trying to only ever merge completely functional/working native-image code, but no promises this will always work.
   More automated testing to come, maybe...
 - Ideally get versioning setup as well

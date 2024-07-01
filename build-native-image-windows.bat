@@ -1,6 +1,6 @@
 @echo off
 set root=%~dp0
-set version=1.0
+set version=1.0-all
 call %root%gradlew.bat clean build
 echo making config directory
 mkdir %root%build\libs\META-INF\native-image
@@ -36,7 +36,7 @@ mkdir %exeBuildResultPath%
 cd %exeBuildResultPath%
 echo building native image
 @REM "-J--add-modules -JALL-SYSTEM" is part of a work around which should be fixed in later graalvm version: https://github.com/oracle/graal/issues/4671
-call native-image --no-fallback -J--add-modules -JALL-SYSTEM --report-unsupported-elements-at-runtime -H:ConfigurationFileDirectories=%configPath% -jar %root%build\libs\mal-cli-1.0-SNAPSHOT-all.jar mal --enable-url-protocols=https,http
+call native-image --no-fallback -J--add-modules -JALL-SYSTEM --report-unsupported-elements-at-runtime -H:ConfigurationFileDirectories=%configPath% -jar %root%build\libs\mal-cli-%version%.jar mal --enable-url-protocols=https,http
 echo running exe to test! mal.exe is found at "%exeBuildResultPath%"
 call %exeBuildResultPath%\mal
 cd %root%

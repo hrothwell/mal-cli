@@ -9,6 +9,7 @@ jobs:
     uses: ./.github/workflows/gradle.yml
   push_to_registry:
     name: Push Docker image to Docker Hub
+    needs: checkout_and_gradle_build
     runs-on: ubuntu-latest
     permissions:
       packages: write

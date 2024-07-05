@@ -8,7 +8,7 @@ A CLI to interact with MyAnimeList's web API
 
 ## [Usage](../../wiki/Usage)
 
-``` 
+```
 ~ mal -h
 
 Usage: mal [OPTIONS] COMMAND [ARGS]...
@@ -37,6 +37,10 @@ https://github.com/hrothwell/mal-cli
 ## Latest Windows native exe
 
 - Latest windows exe build can be found [here](./native-image-items/build-results)
-- I am trying to only ever merge completely functional/working native-image code, but no promises this will always work.
-  More automated testing to come, maybe...
-- Ideally get versioning setup as well
+- I am trying to only ever merge completely functional/working native-image code, but no promises this will always work. Released builds should be most stable
+
+## Docker Image
+
+- application can also be run using docker image: `docker run --mount type=bind,source="$PATH_TO_MAL_CLI",target="/root/mal-cli" -p "8080:8080" "hrothwell/mal-cli:$VERSION" <args>`
+  - `PATH_TO_MAL_CLI` --> Absolute path to location of your config files as documented in the pre-requirments above
+- [mal.sh](./mal.sh) is meant to be a helper script for running in this manner

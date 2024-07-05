@@ -29,6 +29,10 @@ class MalUtil {
       }
     }
 
+    fun printError(msg: String) {
+      println("$RED$msg$RESET")
+    }
+
     fun openUrl(url: String) {
       if (shouldOpenUrls) {
         try {

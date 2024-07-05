@@ -110,14 +110,12 @@ class Login : CliktCommand(
       }
     }
 
-    MalUtil.printDebug("exchangeAuthCode - deconde response")
     val result = runBlocking {
       if (response.status.isSuccess()) {
         response.body<MalOAuthResponse>()
       } else {
-        echoError("Could not read response")
+        echoError("Could not read MAL OAuth response")
         echoError(response.bodyAsText())
-
         throw Exception()
       }
     }
@@ -128,7 +126,7 @@ class Login : CliktCommand(
   }
 
   private fun echoError(msg: String) {
-    echo("${MalUtil.RED} $msg ${MalUtil.RESET}", err = true)
+    echo("${MalUtil.RED}$msg${MalUtil.RESET}", err = true)
   }
 
   private class MALOAuthHttpHandler : HttpHandler {
@@ -148,7 +146,7 @@ class Login : CliktCommand(
         MalUtil.printDebug("MALOAuthHttpHandler.handle - exit")
       } catch (t: Throwable) {
         exchange?.sendResponseHeaders(404, 0)
-        exchange?.responseBody?.write("something didn't work right".toByteArray())
+        exchange?.responseBody?.write("something unexpected happened: $t".toByteArray())
         throw LoginException("Error handling http request response from MAL during login process", t)
       } finally {
         exchange?.close()

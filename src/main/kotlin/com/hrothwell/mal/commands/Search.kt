@@ -28,13 +28,13 @@ class Search : CliktCommand(
   override fun run() {
     try {
       if (MalUtil.isAnime) {
-        val animeList = MalClient.getAnimeList(keywords, limit.toInt())
+        val animeList = MalClient.searchAnime(keywords, limit.toInt())
         echo(animeList.map { it.title })
         if (animeList.size == 1) {
           MalUtil.openAnime(animeList.first())
         }
       } else {
-        val mangaList = MalClient.getMangaList(keywords, limit.toInt())
+        val mangaList = MalClient.searchManga(keywords, limit.toInt())
         echo(mangaList.map { it.title })
         if (mangaList.size == 1) {
           MalUtil.openManga(mangaList.first())

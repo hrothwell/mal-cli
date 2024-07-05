@@ -15,6 +15,8 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -39,19 +41,22 @@ class MalClient {
     val ktor = HttpClient(CIO) {
       defaultRequest {
         url("https://api.myanimelist.net/v2/")
-        // client id should never change
         header("X-MAL-CLIENT-ID", FileUtil.getUserSecrets().clientId)
       }
 
       install(ContentNegotiation) {
         json(FileUtil.jsonReader)
       }
+
+      install(Logging) {
+        logger = ClientLogger()
+        level = LogLevel.BODY
+      }
     }
 
-    private val allAnimeFields =
-      "fields" to "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status"
+    private val allAnimeFields = "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status"
 
-    private val allMangaFields = "fields" to "status,mean,rank,popularity,num_volumes,num_chapters,list_status"
+    private val allMangaFields = "status,mean,rank,popularity,num_volumes,num_chapters,list_status"
 
     fun getRandomAnime(user: String?, list: String, includeNotYetAired: Boolean): AnimeNode? {
       MalUtil.printDebug("getRandomAnime - enter")
@@ -63,7 +68,7 @@ class MalClient {
         ktor.get("users/$userPathParam/animelist") {
           parameter("status", list)
           parameter("limit", 1000)
-          parameter("fields", "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status")
+          parameter("fields", allAnimeFields)
         }
       }
 
@@ -88,7 +93,7 @@ class MalClient {
         ktor.get("users/$userPathParam/mangalist") {
           parameter("status", list)
           parameter("limit", 1000)
-          parameter("fields", "status,mean,rank,popularity,num_volumes,num_chapters,list_status")
+          parameter("fields", allMangaFields)
         }
       }
 
@@ -104,13 +109,10 @@ class MalClient {
       }.randomOrNull()?.node
     }
 
-    /**
-     * essentially a "search" function
-     */
-    fun getAnimeList(query: String, limit: Int): List<AnimeNode> {
+    fun searchAnime(query: String, limit: Int): List<AnimeNode> {
       MalUtil.printDebug("getAnimeList - enter")
       val response = runBlocking {
-        ktor.get("https://api.myanimelist.net/v2/anime") {
+        ktor.get("anime") {
           parameter("q", query)
           parameter("limit", limit.absoluteValue)
           parameter("fields", "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status")
@@ -121,17 +123,13 @@ class MalClient {
         response.getBody<MalGenericListResponse<AnimeData>>()
       } ?: MalGenericListResponse(emptyList())
 
-      MalUtil.printDebug("getAnimeList - exit")
       return result.data.map { it.node }
     }
 
-    /**
-     * essentially a "search" function
-     */
-    fun getMangaList(query: String, limit: Int): List<MangaNode> {
+    fun searchManga(query: String, limit: Int): List<MangaNode> {
       MalUtil.printDebug("getMangaList - enter")
       val response = runBlocking {
-        ktor.get("https://api.myanimelist.net/v2/manga") {
+        ktor.get("manga") {
           parameter("q", query)
           parameter("limit", limit.absoluteValue)
           parameter("fields", "status,mean,rank,popularity,num_episodes,average_episode_duration,list_status")
@@ -142,8 +140,6 @@ class MalClient {
         response.getBody<MalGenericListResponse<MangaData>>()
       } ?: MalGenericListResponse(emptyList())
 
-
-      MalUtil.printDebug("getMangaList - exit")
       return result.data.map { it.node }
     }
 
@@ -152,13 +148,10 @@ class MalClient {
      */
     fun getSuggestedAnime(limit: Int): List<AnimeNode> {
       MalUtil.printDebug("getSuggestedAnime - enter")
-      val limitToUse = if (limit.absoluteValue > 100) 100 else limit.absoluteValue
+      val limitToUse = minOf(limit.absoluteValue, 100)
 
-      MalUtil.printDebug("getSuggestedAnime - calling callWithOauth")
-
-      // TODO this needs the oauth token on it
       val response = runBlocking {
-        ktor.get("https://api.myanimelist.net/v2/anime/suggestions") {
+        ktor.get("anime/suggestions") {
           parameter("limit", limitToUse)
           oauthHeader()
         }
@@ -178,10 +171,15 @@ class MalClient {
     }
 
     private suspend inline fun <reified T> HttpResponse.getBody(): T? {
-      return if (this.status.isSuccess()) {
-        return this.body<T>()
-      } else {
-        // TODO error handling / logging
+      return try {
+        if (this.status.isSuccess()) {
+          return this.body<T>()
+        } else {
+          MalUtil.printError("Invalid response from MAL: $this")
+          null
+        }
+      } catch (e: Exception) {
+        MalUtil.printError("Failed to read body from MAL: $this")
         null
       }
     }
@@ -190,7 +188,6 @@ class MalClient {
       MalUtil.printDebug("refreshOAuthToken - enter")
 
       val userSecrets = FileUtil.getUserSecrets()
-      MalUtil.printDebug("refreshOAuthToken - posting for response")
 
       val response = runBlocking {
         ktor.post("https://myanimelist.net/v1/oauth2/token") {
@@ -207,16 +204,9 @@ class MalClient {
       }
 
       val result = runBlocking {
-        if (response.status.isSuccess()) {
-          response.getBody<MalOAuthResponse>()
-        } else {
-          // TODO
-          println("ERROR: $response")
-          throw Exception()
-        }
+        response.getBody<MalOAuthResponse>()!!
       }
 
-      MalUtil.printDebug("refreshOAuthToken - decode response and updating secrets")
       val updatedSecrets = userSecrets.copy(oauthTokens = result)
       FileUtil.updateUserSecrets(updatedSecrets)
       return updatedSecrets.oauthTokens?.accessToken

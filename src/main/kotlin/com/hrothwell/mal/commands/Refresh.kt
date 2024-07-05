@@ -24,6 +24,6 @@ class Refresh : CliktCommand(
   }
 
   private fun echoError(msg: String) {
-    echo("${MalUtil.RED} $msg ${MalUtil.RESET}", err = true)
+    echo("${MalUtil.RED}$msg${MalUtil.RESET}", err = true)
   }
 }

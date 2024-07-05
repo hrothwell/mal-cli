@@ -5,13 +5,17 @@ on:
     types: [published]
 
 jobs:
-  # checkout_and_gradle_build:
-  #   uses: ./.github/workflows/gradle.yml
-  build:
-    name: gradle build
+  build_and_publish:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
     steps:
+      # TODO if there is a nice way to reuse the gradle.yml workflow that would be ideal here, but given each
+      #  job is its own VM and I need the output output from the build command, this seems like easiest / quickest for now
       - uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -24,29 +28,16 @@ jobs:
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: build
-  push_to_registry:
-    name: Push Docker image to Docker Hub
-    # needs: checkout_and_gradle_build
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
-    steps:
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: hrothwell/mal-cli
-
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
